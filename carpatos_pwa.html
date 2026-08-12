@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1B2A4A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Cárpatos">
+  <title>El Secreto de los Cárpatos</title>
+  <style>
+    :root {
+      --navy: #1B2A4A;
+      --navy-mid: #243560;
+      --navy-light: #2E4275;
+      --gold: #C5A028;
+      --gold-light: #D4B84A;
+      --blue-soft: #B0C4DE;
+      --white: #F5F0E8;
+      --text: #E8E0D0;
+      --muted: #8899AA;
+      --card-bg: #243560;
+      --radius: 12px;
+      --bottom-nav-h: 64px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; background: var(--navy); color: var(--text); font-family: -apple-system, 'Segoe UI', sans-serif; overflow: hidden; }
+
+    /* SCREENS */
+    .screen { position: fixed; inset: 0; bottom: var(--bottom-nav-h); overflow-y: auto; display: none; -webkit-overflow-scrolling: touch; }
+    .screen.active { display: block; }
+
+    /* COVER */
+    #screen-home {
+      background: linear-gradient(180deg, #0D1A2E 0%, #1B2A4A 60%, #243560 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      padding-bottom: 2rem;
+    }
+    .cover-hero {
+      width: 100%; aspect-ratio: 4/3; max-height: 280px;
+      background: linear-gradient(135deg, #0D1A2E, #1B2A4A, #243560);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; position: relative; overflow: hidden;
+    }
+    .cover-hero-art {
+      font-size: 80px; opacity: 0.15; user-select: none;
+      position: absolute; bottom: -10px; right: 10px;
+    }
+    .cover-title-block {
+      position: absolute; bottom: 20px; left: 20px; right: 20px;
+    }
+    .cover-eyebrow { font-size: 10px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 4px; }
+    .cover-title { font-size: 28px; font-weight: 700; color: var(--white); line-height: 1.1; }
+    .cover-subtitle { font-size: 13px; color: var(--blue-soft); margin-top: 4px; font-style: italic; }
+
+    .cover-body { width: 100%; padding: 20px 16px 0; }
+    .trip-card {
+      background: var(--card-bg); border-radius: var(--radius);
+      padding: 16px; margin-bottom: 12px; border: 1px solid rgba(197,160,40,0.2);
+    }
+    .trip-card-title { font-size: 11px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 10px; }
+    .trip-stat { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .trip-stat:last-child { border-bottom: none; }
+    .trip-stat-label { font-size: 13px; color: var(--muted); }
+    .trip-stat-value { font-size: 13px; color: var(--text); font-weight: 500; }
+
+    .section-btn {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--card-bg); border-radius: var(--radius);
+      padding: 14px 16px; margin-bottom: 10px; cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.06); width: 100%;
+      text-align: left; color: var(--text);
+    }
+    .section-btn-icon { font-size: 22px; width: 36px; text-align: center; flex-shrink: 0; }
+    .section-btn-text h3 { font-size: 15px; font-weight: 600; }
+    .section-btn-text p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .section-btn-arrow { margin-left: auto; color: var(--muted); font-size: 18px; }
+
+    /* DAYS LIST */
+    #screen-dias { background: var(--navy); padding: 16px; }
+    .screen-header { font-size: 11px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(197,160,40,0.2); }
+
+    .day-card {
+      background: var(--card-bg); border-radius: var(--radius);
+      margin-bottom: 10px; overflow: hidden; cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .day-card-header {
+      display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+    }
+    .day-num {
+      background: var(--gold); color: var(--navy); font-weight: 700;
+      font-size: 13px; min-width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .day-info { flex: 1; min-width: 0; }
+    .day-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .day-sub { font-size: 11px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .day-chevron { color: var(--muted); font-size: 16px; flex-shrink: 0; transition: transform 0.2s; }
+    .day-card.open .day-chevron { transform: rotate(90deg); }
+    .day-card-body { display: none; padding: 0 16px 16px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .day-card.open .day-card-body { display: block; }
+
+    .day-route-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(197,160,40,0.12); border: 1px solid rgba(197,160,40,0.3);
+      border-radius: 20px; padding: 4px 10px; font-size: 11px; color: var(--gold);
+      margin: 12px 0 14px;
+    }
+
+    .places-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+    .place-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .place-item:last-child { border-bottom: none; }
+    .place-icon { font-size: 18px; width: 28px; text-align: center; flex-shrink: 0; margin-top: 1px; }
+    .place-text { flex: 1; min-width: 0; }
+    .place-name { font-size: 14px; font-weight: 500; }
+    .place-desc { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+    .place-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+    .tag {
+      font-size: 10px; padding: 2px 8px; border-radius: 10px;
+      background: rgba(176,196,222,0.1); color: var(--blue-soft); border: 1px solid rgba(176,196,222,0.2);
+    }
+    .tag.must { background: rgba(197,160,40,0.12); color: var(--gold); border-color: rgba(197,160,40,0.3); }
+    .gps-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(197,160,40,0.15); border: 1px solid rgba(197,160,40,0.4);
+      color: var(--gold); font-size: 11px; padding: 4px 10px; border-radius: 20px;
+      text-decoration: none; margin-top: 8px; cursor: pointer;
+    }
+    .momento-box {
+      background: var(--navy); border-left: 3px solid var(--gold);
+      border-radius: 0 8px 8px 0; padding: 12px; margin-top: 14px;
+    }
+    .momento-label { font-size: 10px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 6px; }
+    .momento-text { font-size: 13px; color: var(--blue-soft); font-style: italic; line-height: 1.5; }
+
+    /* GASTRONOMY */
+    #screen-gastro { background: var(--navy); padding: 16px; }
+    .gastro-section { margin-bottom: 20px; }
+    .gastro-title {
+      font-size: 11px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase;
+      margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid rgba(197,160,40,0.2);
+    }
+    .gastro-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .gastro-item:last-child { border-bottom: none; }
+    .gastro-emoji { font-size: 20px; width: 32px; text-align: center; flex-shrink: 0; }
+    .gastro-item-text h4 { font-size: 14px; font-weight: 600; }
+    .gastro-item-text p { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+    /* INFO */
+    #screen-info { background: var(--navy); padding: 16px; }
+    .info-card { background: var(--card-bg); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.06); }
+    .info-card h3 { font-size: 13px; font-weight: 700; color: var(--gold); margin-bottom: 10px; letter-spacing: 1px; }
+    .info-item { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); align-items: flex-start; }
+    .info-item:last-child { border-bottom: none; }
+    .info-item-icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
+    .info-item-text { font-size: 13px; line-height: 1.4; color: var(--text); }
+    .info-item-text strong { color: var(--white); }
+    .info-item-text a { color: var(--gold); text-decoration: none; }
+
+    .warn-box { background: rgba(197,160,40,0.08); border: 1px solid rgba(197,160,40,0.3); border-radius: 8px; padding: 12px; margin: 10px 0; }
+    .warn-box p { font-size: 12px; color: var(--gold-light); line-height: 1.5; }
+
+    /* HOTEL / VUELO cards */
+    .placeholder-card {
+      background: var(--card-bg); border-radius: var(--radius); padding: 16px;
+      margin-bottom: 10px; border: 1px dashed rgba(197,160,40,0.3);
+    }
+    .placeholder-card h4 { font-size: 13px; color: var(--gold); margin-bottom: 6px; }
+    .placeholder-card p { font-size: 12px; color: var(--muted); }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: var(--bottom-nav-h); background: #111E33;
+      border-top: 1px solid rgba(197,160,40,0.2);
+      display: flex; z-index: 100;
+    }
+    .nav-btn {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 3px; cursor: pointer; border: none;
+      background: transparent; color: var(--muted); transition: color 0.15s;
+      padding: 0; font-size: 0;
+    }
+    .nav-btn.active { color: var(--gold); }
+    .nav-btn span { font-size: 22px; }
+    .nav-btn small { font-size: 10px; letter-spacing: 0.5px; }
+
+    /* PHRASES */
+    .phrase-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .phrase-item:last-child { border-bottom: none; }
+    .phrase-ro { font-size: 14px; font-weight: 600; color: var(--white); }
+    .phrase-es { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .phrase-pron { font-size: 11px; color: var(--blue-soft); margin-top: 1px; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════ SCREEN: HOME ══════════════════ -->
+<div id="screen-home" class="screen active">
+  <div class="cover-hero">
+    <div class="cover-hero-art">🏔️</div>
+    <div class="cover-title-block">
+      <div class="cover-eyebrow">Guía de viaje · julio 2027</div>
+      <div class="cover-title">El Secreto de los Cárpatos</div>
+      <div class="cover-subtitle">12 días en solitario por Rumanía</div>
+    </div>
+  </div>
+
+  <div class="cover-body">
+    <div class="trip-card">
+      <div class="trip-card-title">El viaje</div>
+      <div class="trip-stat"><span class="trip-stat-label">Destino</span><span class="trip-stat-value">Rumanía</span></div>
+      <div class="trip-stat"><span class="trip-stat-label">Duración</span><span class="trip-stat-value">12 días + vuelos</span></div>
+      <div class="trip-stat"><span class="trip-stat-label">Salida</span><span class="trip-stat-value">Alicante (ALC)</span></div>
+      <div class="trip-stat"><span class="trip-stat-label">Llegada</span><span class="trip-stat-value">Bucarest OTP · 14:40</span></div>
+      <div class="trip-stat"><span class="trip-stat-label">Transporte</span><span class="trip-stat-value">Coche de alquiler</span></div>
+      <div class="trip-stat"><span class="trip-stat-label">Viajero</span><span class="trip-stat-value">Solo · 1 persona</span></div>
+    </div>
+
+    <!-- Vuelo placeholder -->
+    <div class="placeholder-card">
+      <h4>✈️ Vuelo — pendiente de reserva</h4>
+      <p>Añade aquí número de vuelo, hora, terminal y enlace a la reserva cuando tengas el billete.</p>
+    </div>
+
+    <button class="section-btn" onclick="goTo('dias')">
+      <span class="section-btn-icon">🗺️</span>
+      <span class="section-btn-text"><h3>Los 12 días</h3><p>Itinerario completo día a día</p></span>
+      <span class="section-btn-arrow">›</span>
+    </button>
+    <button class="section-btn" onclick="goTo('gastro')">
+      <span class="section-btn-icon">🍽️</span>
+      <span class="section-btn-text"><h3>Gastronomía</h3><p>Qué comer, beber y probar</p></span>
+      <span class="section-btn-arrow">›</span>
+    </button>
+    <button class="section-btn" onclick="goTo('info')">
+      <span class="section-btn-icon">🧭</span>
+      <span class="section-btn-text"><h3>Info práctica</h3><p>Logística, frases, errores a evitar</p></span>
+      <span class="section-btn-arrow">›</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════ SCREEN: DÍAS ══════════════════ -->
+<div id="screen-dias" class="screen">
+  <div class="screen-header">Itinerario · 12 días</div>
+
+  <!-- DÍA 1 -->
+  <div class="day-card" onclick="toggleDay(this)">
+    <div class="day-card-header">
+      <div class="day-num">1</div>
+      <div class="day-info">
+        <div class="day-title">El Caos que Enamora</div>
+        <div class="day-sub">Bucarest — Primera noche en la capital</div>
+      </div>
+      <div class="day-chevron">›</div>
+    </div>
+    <div class="day-card-body">
+      <div class="day-route-pill">✈️ vuelo · llegada 14:40 · Muntenia</div>
+      <div class="places-label">Qué ver</div>
+      <div class="place-item">
+        <div class="place-icon">✈️</div>
+        <div class="place-text">
+          <div class="place-name">Llegada · Aeropuerto Otopeni (OTP)</div>
+          <div class="place-desc">Vuelo Alicante (ALC) → Bucarest (OTP) con Wizz Air: salida 10:15, llegada 14:40 (3h 25 min). Salir del aeropuerto lleva 30-40 minutos entre equipaje y controles, así que estarás en el hotel hacia las 15:30-16:00. Uber o taxi oficial hasta el alojamiento: el coche de alquiler se recoge mañana. No conducir por el centro de Bucarest si se puede evitar — el tráfico es un mundo aparte.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Aeroportul+Henri+Coanda+Otopeni" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏛️</div>
+        <div class="place-text">
+          <div class="place-name">Pasajul Macca-Villacrosse</div>
+          <div class="place-desc">Pasaje comercial cubierto de 1891 con techo de vidrio amarillo, uno de los rincones más fotogénicos de la ciudad. Es el vestigio del Bucarest que se ganó el apodo de "París de los Balcanes" en el siglo XIX, cuando los grandes bulevares y los palacetes art nouveau definían la capital.</div>
+          <div class="place-tags"><span class="tag must">Imprescindible</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Pasajul+Macca-Villacrosse+Bucuresti" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏘️</div>
+        <div class="place-text">
+          <div class="place-name">Barrio Lipscani</div>
+          <div class="place-desc">El casco histórico y el lugar ideal para el primer contacto con la ciudad: calles adoquinadas, terrazas y ambiente nocturno. Aquí cae la primera cerveza rumana — Ursus o Timișoreana — y una cena tranquila sin planificar nada.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Lipscani+Bucarest" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🍽️</div>
+        <div class="place-text">
+          <div class="place-name">Caru' cu Bere</div>
+          <div class="place-desc">La cervecería histórica más bella de Bucarest (1879), con un interior neogótico espectacular de vidrieras, madera tallada y azulejos. La cena recomendada para la primera noche.</div>
+          <div class="place-tags"><span class="tag">Cena</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Caru+cu+Bere+Bucuresti" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🛣️</div>
+        <div class="place-text">
+          <div class="place-name">Bulevardul Unirii</div>
+          <div class="place-desc">Diseñado por Ceaușescu como la versión rumana de los Campos Elíseos — deliberadamente más ancho que el original. Pasear por él es la manera más rápida de entender la ambición megalomaníaca del régimen.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Bulevardul+Unirii+Bucuresti" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏟️</div>
+        <div class="place-text">
+          <div class="place-name">Palacio del Parlamento</div>
+          <div class="place-desc">El edificio administrativo más pesado del mundo (4.098 millones de toneladas). Para construirlo, el régimen de Ceaușescu demolió buena parte del casco histórico en los años 80. Dejarlo para mañana si no da tiempo hoy.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Palatul+Parlamentului+Bucuresti" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="placeholder-card" style="margin-top:14px">
+        <h4>🏨 Hotel Bucarest — pendiente</h4>
+        <p>Zona recomendada: Dorobanți o Floreasca — tranquilos, con buena conexión al aeropuerto y aparcamiento para el coche que se recoge mañana. Añade nombre, dirección, código de reserva, check-in/out y teléfono cuando reserves.</p>
+      </div>
+      <div class="momento-box">
+        <div class="momento-label">✦ El momento del día</div>
+        <div class="momento-text">Son las siete de la tarde en el Pasajul Macca-Villacrosse. El vidrio amarillo filtra la luz de una manera que no existe en ningún otro sitio. Hay olor a tilo. Bucarest todavía no te ha contado nada y ya te tiene.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DÍA 2 -->
+  <div class="day-card" onclick="toggleDay(this)">
+    <div class="day-card-header">
+      <div class="day-num">2</div>
+      <div class="day-info">
+        <div class="day-title">La Puerta de los Cárpatos</div>
+        <div class="day-sub">Bucarest → Sinaia → Brașov</div>
+      </div>
+      <div class="day-chevron">›</div>
+    </div>
+    <div class="day-card-body">
+      <div class="day-route-pill">🚗 154 km · 2h 30 min · Muntenia · Transilvania</div>
+      <div class="places-label">Qué ver</div>
+      <div class="place-item">
+        <div class="place-icon">🚗</div>
+        <div class="place-text">
+          <div class="place-name">Recogida del coche · Aeropuerto OTP</div>
+          <div class="place-desc">Reservar previamente con Europcar, Avis o Budget. Antes de salir del aeropuerto, activar la rovinieta (viñeta de carretera) en roviniete.ro o en cualquier gasolinera. Primera conducción por Rumanía: la DN1 hacia el norte, subiendo suavemente hacia los Cárpatos por el Valle de Prahova, la puerta natural entre Valaquia y Transilvania durante siglos.</div>
+          <div class="place-tags"><span class="tag must">Rovinieta obligatoria</span></div>
+          <a class="gps-btn" href="https://roviniete.ro" target="_blank">🌐 roviniete.ro</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏰</div>
+        <div class="place-text">
+          <div class="place-name">Castillo de Peleș (Sinaia)</div>
+          <div class="place-desc">Residencia de verano del rey Carol I, terminada en 1883. Un palacio neo-renacimiento alemán completamente fuera de lugar en pleno bosque de abetos de los Cárpatos — y precisamente por eso, irresistible. El castillo más bonito de Rumanía, sin competencia. Entradas en efectivo: 40-80 lei según el recorrido.</div>
+          <div class="place-tags"><span class="tag must">No te lo saltes</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Castelul+Peles+Sinaia" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">⛪</div>
+        <div class="place-text">
+          <div class="place-name">Monasterio de Sinaia</div>
+          <div class="place-desc">Fundado en 1695 por el noble Mihai Cantacuzino, que lo dedicó al Monte Sinaí donde había peregrinado — de ahí el nombre de la ciudad. El origen de todo: cuando Carol I descubrió este valle en 1866, lo convirtió en el "Biarritz rumano". A pocos minutos de Peleș.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Manastirea+Sinaia" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏟️</div>
+        <div class="place-text">
+          <div class="place-name">Castelul Bran</div>
+          <div class="place-desc">El "castillo de Drácula", a 28 km de Brașov. Conviene tener claras las expectativas: su vínculo real con Vlad Țepeș es mínimo y comercialmente exagerado, la visita es cara y masificada, y el castillo en sí es pequeño. Peleș lo supera en todos los sentidos. Merece una parada rápida solo si la curiosidad puede más — y sabiendo lo que es.</div>
+          <div class="place-tags"><span class="tag">Opcional</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Castelul+Bran+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏙️</div>
+        <div class="place-text">
+          <div class="place-name">Brașov</div>
+          <div class="place-desc">Fundada en 1211 por los Caballeros Teutónicos, fue durante siglos el mayor centro comercial del sudeste de Europa. Arquitectura sajona impecable, restaurantes excelentes y la ubicación perfecta como base para los próximos días. Llegada por la tarde y paseo por Piața Sfatului al atardecer.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Piata+Sfatului+Brasov" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🍽️</div>
+        <div class="place-text">
+          <div class="place-name">Restaurante Sergiana</div>
+          <div class="place-desc">Cocina tradicional rumana en Brașov, con los sarmale (rollitos de col rellenos) como especialidad de la casa. La cena recomendada del día.</div>
+          <div class="place-tags"><span class="tag">Cena</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Restaurant+Sergiana+Brasov" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="placeholder-card" style="margin-top:14px">
+        <h4>🏨 Hotel Brașov — pendiente</h4>
+        <p>Reservar 2 noches aquí para aprovechar mejor los alrededores. Añade nombre, dirección, código de reserva, check-in/out y teléfono cuando reserves.</p>
+      </div>
+      <div class="momento-box">
+        <div class="momento-label">✦ El momento del día</div>
+        <div class="momento-text">Llevas diez minutos en Sinaia cuando el Peleș aparece entre los abetos. No hay preparación posible para ese instante.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DÍA 3 -->
+  <div class="day-card" onclick="toggleDay(this)">
+    <div class="day-card-header">
+      <div class="day-num">3</div>
+      <div class="day-info">
+        <div class="day-title">Entre Osos y Campanarios</div>
+        <div class="day-sub">Brașov — La ciudad sajona</div>
+      </div>
+      <div class="day-chevron">›</div>
+    </div>
+    <div class="day-card-body">
+      <div class="day-route-pill">📍 Día de base · Transilvania</div>
+      <div class="places-label">Qué ver</div>
+      <div class="place-item">
+        <div class="place-icon">⛪</div>
+        <div class="place-text">
+          <div class="place-name">Iglesia Negra</div>
+          <div class="place-desc">La mayor iglesia gótica de Europa central al sur de los Alpes, del siglo XIV. Se llama "Negra" desde el gran incendio de 1689, que ennegreció sus muros. Interior sobrio y poderoso. Los sajones que la levantaron fueron llamados por el rey húngaro Géza II en el siglo XII para fortificar la frontera.</div>
+          <div class="place-tags"><span class="tag must">Imprescindible</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Biserica+Neagra+Brasov" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏙️</div>
+        <div class="place-text">
+          <div class="place-name">Piața Sfatului</div>
+          <div class="place-desc">La Plaza del Consejo, con el antiguo ayuntamiento en el centro y terrazas alrededor. El corazón de Brașov y el mejor sitio para sentarse al atardecer.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Piata+Sfatului+Brasov" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏔️</div>
+        <div class="place-text">
+          <div class="place-name">Monte Tampa (teleférico)</div>
+          <div class="place-desc">La colina que domina la ciudad, con el cartel de BRAȘOV en la ladera al estilo Hollywood. El teleférico sube en pocos minutos y arriba hay vistas completas sobre los tejados rojos y el trazado medieval.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Telescaun+Tampa+Brasov" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🚶</div>
+        <div class="place-text">
+          <div class="place-name">Strada Sforii (Calle de la Cuerda)</div>
+          <div class="place-desc">Considerada una de las calles más estrechas de Europa: 1,32 metros en su punto más angosto. Un callejón entre dos muros que se cruza en un minuto y se recuerda siempre.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Strada+Sforii+Brasov" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏘️</div>
+        <div class="place-text">
+          <div class="place-name">Barrio de Șchei</div>
+          <div class="place-desc">Mientras sajones y húngaros vivían intramuros, los valacos habitaban aquí, fuera de las murallas. Es el Brașov rumano frente al Brașov germánico, y explica la ciudad mejor que cualquier monumento.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Schei+Brasov" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🐻</div>
+        <div class="place-text">
+          <div class="place-name">Avistamiento de osos en los Cárpatos</div>
+          <div class="place-desc">La experiencia estrella de la tarde. Varios operadores locales organizan salidas de 2-3 horas a los escondites del bosque donde los osos pardos bajan a alimentarse al atardecer. Rumanía alberga la mayor población de osos pardos de Europa continental, con más de 6.000 ejemplares. Coste: 45-60 € por persona.</div>
+          <div class="place-tags"><span class="tag must">Experiencia estrella</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=bear+watching+Brasov+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏰</div>
+        <div class="place-text">
+          <div class="place-name">Ciudadela de Râșnov</div>
+          <div class="place-desc">A 16 km de Brașov. Fortaleza campesina del siglo XIII con una vista panorámica excepcional sobre el valle. Merece una visita rápida de una hora.</div>
+          <div class="place-tags"><span class="tag">En los alrededores</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Cetatea+Rasnov+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">⛰️</div>
+        <div class="place-text">
+          <div class="place-name">Muntele Omu (2.505 m)</div>
+          <div class="place-desc">El pico más alto de los Bucegi, accesible desde Bușteni (45 km de Brașov) combinando coche y telecabina: Bușteni → Babele (1.680 m) y después 1,5-2 h de senderismo hasta la cumbre. Arriba hay una estación meteorológica con refugio y vistas sobre toda la cadena de los Cárpatos. Ir antes de las 9h para evitar colas en la telecabina en julio. Ropa de abrigo y chubasquero aunque en Brașov haga calor: en la cima puede bajar a 10 °C.</div>
+          <div class="place-tags"><span class="tag">Opcional</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Telecabina+Busteni+Babele" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="placeholder-card" style="margin-top:14px">
+        <h4>🏨 Hotel Brașov (2ª noche) — pendiente</h4>
+        <p>Misma reserva que el día 2 si son noches seguidas. Confirma que la reserva cubre las dos noches.</p>
+      </div>
+      <div class="momento-box">
+        <div class="momento-label">✦ El momento del día</div>
+        <div class="momento-text">Atardecer en Piața Sfatului. Las campanas de la Iglesia Negra marcan las seis. Las mesas de las terrazas se llenan. La luz cae sobre los tejados de tejas rojas y la ciudad parece sacada de un cuento.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DÍA 4 -->
+  <div class="day-card" onclick="toggleDay(this)">
+    <div class="day-card-header">
+      <div class="day-num">4</div>
+      <div class="day-info">
+        <div class="day-title">La Ruta que Conquistó el Mundo</div>
+        <div class="day-sub">La Carretera Transfăgărășan</div>
+      </div>
+      <div class="day-chevron">›</div>
+    </div>
+    <div class="day-card-body">
+      <div class="day-route-pill">🚗 133 km · 3h 30 min · Transilvania</div>
+      <div class="places-label">Qué ver</div>
+      <div class="place-item">
+        <div class="place-icon">🛣️</div>
+        <div class="place-text">
+          <div class="place-name">Transfăgărășan completa (DN7C)</div>
+          <div class="place-desc">Ceaușescu la mandó construir entre 1970 y 1974 tras la invasión soviética de Checoslovaquia: necesitaba una ruta militar alternativa a través de los Cárpatos. Costó 6.000 toneladas de dinamita y la vida de decenas de trabajadores. Jeremy Clarkson la declaró "la mejor carretera del mundo" en Top Gear (2009). Asciende hasta los 2.042 m y solo abre de junio a octubre. Salir antes de las 8h para evitar la cola en el tramo norte, repostar antes de entrar (no hay gasolineras en la ruta) y llevar abrigo aunque sea julio.</div>
+          <div class="place-tags"><span class="tag must">El plato fuerte del viaje</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Transfagarasan+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">💧</div>
+        <div class="place-text">
+          <div class="place-name">Cascada Bâlea</div>
+          <div class="place-desc">La cascada más alta de los montes Făgăraș, justo antes del último tramo de curvas hacia el collado. Parada corta con teleférico opcional hasta el lago.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Cascada+Balea+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏔️</div>
+        <div class="place-text">
+          <div class="place-name">Lago Bâlea Lac</div>
+          <div class="place-desc">En la cumbre, a 2.034 m. Lago glaciar rodeado de picos y nieves perpetuas incluso en pleno verano. Frío de verdad en julio. Reservar aquí una hora como mínimo — es el punto culminante del día y del viaje.</div>
+          <div class="place-tags"><span class="tag must">Imprescindible</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Balea+Lac+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🌊</div>
+        <div class="place-text">
+          <div class="place-name">Lago Vidraru y su presa</div>
+          <div class="place-desc">En la vertiente sur, el embalse de Vidraru y su enorme presa de arco cierran el valle del Argeș. La carretera lo bordea entre curvas y túneles: ingeniería y naturaleza a partes iguales.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Barajul+Vidraru+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏰</div>
+        <div class="place-text">
+          <div class="place-name">Fortaleza de Poenari</div>
+          <div class="place-desc">El castillo REAL de Vlad el Empalador, sobre un risco en la bajada hacia Vidraru. 1.480 escalones de subida, vistas impresionantes y casi sin turistas. Este sí merece la pena — es el contrapunto honesto a Bran.</div>
+          <div class="place-tags"><span class="tag">En ruta</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Cetatea+Poenari+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏍️</div>
+        <div class="place-text">
+          <div class="place-name">Alternativa: la Transfăgărășan en moto</div>
+          <div class="place-desc">Transylvania Moto Experience (Brașov) organiza un tour guiado de día completo con salida y recogida en el hotel, moto y guía incluidos. La carretera se diseñó para el movimiento rápido de vehículos militares, y en dos ruedas cada curva cobra otra dimensión. Precio aproximado: 150-180 €, reserva previa imprescindible en su web. Es la alternativa al día en coche, no una actividad adicional.</div>
+          <div class="place-tags"><span class="tag">Alternativa al coche</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Transylvania+Moto+Experience+Brasov" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="placeholder-card" style="margin-top:14px">
+        <h4>🏨 Alojamiento zona Transfăgărășan — pendiente</h4>
+        <p>Opción destacada: la Cabaña Bâlea Lac, a 2.034 m de altitud, junto al lago glaciar. Alternativas en la vertiente sur (Arefu, Căpățâneni o Cârțișoara). Pocas plazas y cobertura móvil irregular: reserva con antelación y guarda la dirección offline.</p>
+      </div>
+      <div class="momento-box">
+        <div class="momento-label">✦ El momento del día</div>
+        <div class="momento-text">Arriba del todo, en Bâlea Lac. El motor apagado. Solo viento. Los Alpes del sur de Rumanía en todas las direcciones. El silencio no es ausencia de ruido — es presencia de algo más.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DÍA 5 -->
+  <div class="day-card" onclick="toggleDay(this)">
+    <div class="day-card-header">
+      <div class="day-num">5</div>
+      <div class="day-info">
+        <div class="day-title">El Otro Lado</div>
+        <div class="day-sub">Transfăgărășan → Curtea de Argeș → Sibiu</div>
+      </div>
+      <div class="day-chevron">›</div>
+    </div>
+    <div class="day-card-body">
+      <div class="day-route-pill">🚗 100 km · 2h 15 min · Transilvania · Muntenia · Oltenia</div>
+      <div class="places-label">Qué ver</div>
+      <div class="place-item">
+        <div class="place-icon">🥾</div>
+        <div class="place-text">
+          <div class="place-name">Senderismo en Bâlea Lac</div>
+          <div class="place-desc">La mañana permite caminar por los alrededores del lago antes de iniciar el descenso. Rutas cortas y bien marcadas por el circo glaciar, con la carretera ya en silencio a primera hora.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Balea+Lac+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">⛪</div>
+        <div class="place-text">
+          <div class="place-name">Monasterio de Curtea de Argeș</div>
+          <div class="place-desc">La joya de la arquitectura religiosa rumana del siglo XVI, con el exterior de mármol tallado en motivos vegetales únicos. Es el monasterio episcopal protagonista de la leyenda del Maestru Manole, el arquitecto que según el relato tuvo que emparedar a su mujer en los muros para que la obra dejara de derrumbarse.</div>
+          <div class="place-tags"><span class="tag must">Imprescindible</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Manastirea+Curtea+de+Arges" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🕍</div>
+        <div class="place-text">
+          <div class="place-name">Monasterio de Cozia</div>
+          <div class="place-desc">En el valle del río Olt, uno de los monumentos medievales mejor conservados de Rumanía: fundado en 1386 por el príncipe Mircea el Viejo, conserva frescos del siglo XIV prácticamente intactos y guarda el cuerpo del propio Mircea, símbolo de la resistencia de Oltenia frente al avance otomano. Añade unos 15 minutos de desvío y está señalizado desde la DN7.</div>
+          <div class="place-tags"><span class="tag">Opcional</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Manastirea+Cozia+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏙️</div>
+        <div class="place-text">
+          <div class="place-name">Sibiu</div>
+          <div class="place-desc">Hermannstadt para los sajones que la fundaron en el siglo XII, capital del principado de Transilvania entre 1692 y 1791 y Capital Europea de la Cultura en 2007. Su seña de identidad son los "ojos de Sibiu": ventanas de buhardilla con forma de párpado inclinado que servían para ventilar los graneros y vigilar la calle, y que parecen mirarte desde todos los tejados. Aparcar en los aparcamientos perimetrales y explorar a pie el centro histórico.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Piata+Mare+Sibiu" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🍽️</div>
+        <div class="place-text">
+          <div class="place-name">Restaurante Hermania</div>
+          <div class="place-desc">Excelente fusión de cocina alemana-sajona y rumana, en pleno centro de Sibiu. La cena recomendada del día.</div>
+          <div class="place-tags"><span class="tag">Cena</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Hermania+Restaurant+Sibiu" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="placeholder-card" style="margin-top:14px">
+        <h4>🏨 Hotel Sibiu — pendiente</h4>
+        <p>Dos noches aquí. Mejor dentro o junto al casco histórico, con aparcamiento perimetral cerca. Añade nombre, dirección, código de reserva y teléfono cuando reserves.</p>
+      </div>
+      <div class="momento-box">
+        <div class="momento-label">✦ El momento del día</div>
+        <div class="momento-text">Entras a Sibiu al atardecer, cansado después de la Transfăgărășan. Los tejados con los "ojos" te miran desde todos los ángulos. Es la primera vez que sientes que la ciudad te observa a ti.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DÍA 6 -->
+  <div class="day-card" onclick="toggleDay(this)">
+    <div class="day-card-header">
+      <div class="day-num">6</div>
+      <div class="day-info">
+        <div class="day-title">La Ciudad de los Ojos</div>
+        <div class="day-sub">Sibiu — Profundidad y calma</div>
+      </div>
+      <div class="day-chevron">›</div>
+    </div>
+    <div class="day-card-body">
+      <div class="day-route-pill">📍 Día de base · Transilvania</div>
+      <div class="places-label">Qué ver</div>
+      <div class="place-item">
+        <div class="place-icon">🏛️</div>
+        <div class="place-text">
+          <div class="place-name">Museo ASTRA</div>
+          <div class="place-desc">Museo al aire libre de 96 hectáreas con más de 300 construcciones tradicionales —casas, molinos, iglesias de madera— trasladadas y reconstruidas piedra a piedra desde toda Rumanía. Uno de los mejores museos etnográficos de Europa: merece una mañana entera, mínimo 3 horas. También es uno de los mejores sitios del viaje para llevarse artesanía auténtica a casa.</div>
+          <div class="place-tags"><span class="tag must">No te lo saltes</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Muzeul+ASTRA+Sibiu" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏙️</div>
+        <div class="place-text">
+          <div class="place-name">Piața Mare, Piața Mică y Piața Huet</div>
+          <div class="place-desc">Tres plazas conectadas en distintos niveles que forman uno de los conjuntos urbanos más elegantes de Transilvania. La topografía —ciudad alta intramuros y ciudad baja comercial— refleja directamente la estructura social medieval de Sibiu.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Piata+Mare+Sibiu" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🌉</div>
+        <div class="place-text">
+          <div class="place-name">Puente de los Mentirosos</div>
+          <div class="place-desc">El primer puente de hierro fundido de Rumanía (1859), que conecta la plaza mayor con el barrio inferior. La leyenda dice que cruje cuando alguien miente sobre él.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Podul+Minciunilor+Sibiu" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🖼️</div>
+        <div class="place-text">
+          <div class="place-name">Museo Brukenthal</div>
+          <div class="place-desc">Palacio barroco del siglo XVIII en la Piața Mare que alberga una colección de pintura europea sorprendentemente buena para el tamaño de la ciudad.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Muzeul+Brukenthal+Sibiu" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🧀</div>
+        <div class="place-text">
+          <div class="place-name">Mercado cubierto junto a Piața Mare</div>
+          <div class="place-desc">Queso de burduf (curado en corteza de pino), embutidos ahumados y pálinca artesanal. La compra de recuerdos comestibles del viaje.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Piata+Cibin+Sibiu" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="placeholder-card" style="margin-top:14px">
+        <h4>🏨 Hotel Sibiu (2ª noche) — pendiente</h4>
+        <p>Misma reserva que el día 5 si son noches seguidas. Confirma que la reserva cubre las dos noches.</p>
+      </div>
+      <div class="momento-box">
+        <div class="momento-label">✦ El momento del día</div>
+        <div class="momento-text">Primera hora de la mañana en el ASTRA. El museo todavía está casi vacío. Un molino de agua del siglo XVIII funciona solo, movido por el riachuelo. No hay nadie más. Solo el ruido del agua y la madera.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DÍA 7 -->
+  <div class="day-card" onclick="toggleDay(this)">
+    <div class="day-card-header">
+      <div class="day-num">7</div>
+      <div class="day-info">
+        <div class="day-title">Donde Nació el Mito</div>
+        <div class="day-sub">Sibiu → Biertan → Sighișoara</div>
+      </div>
+      <div class="day-chevron">›</div>
+    </div>
+    <div class="day-card-body">
+      <div class="day-route-pill">🚗 130 km · 2h 30 min · Transilvania</div>
+      <div class="places-label">Qué ver</div>
+      <div class="place-item">
+        <div class="place-icon">⛪</div>
+        <div class="place-text">
+          <div class="place-name">Biertan</div>
+          <div class="place-desc">Pueblo sajón de 2.500 habitantes con una de las iglesias fortificadas más grandes y mejor conservadas de Transilvania, Patrimonio UNESCO desde 1993. La iglesia-fortaleza del siglo XV domina el valle desde lo alto y el pueblo a sus pies está casi intacto, con muy poco turismo comparado con Sighișoara o Brașov. El desvío desde la DN14 es mínimo. Aparcar abajo y subir a pie (10 minutos); entrada ~15 lei. Mejor por la mañana, antes de que apriete el calor.</div>
+          <div class="place-tags"><span class="tag must">UNESCO</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Biertan+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏰</div>
+        <div class="place-text">
+          <div class="place-name">Sighișoara</div>
+          <div class="place-desc">Probablemente la ciudad medieval mejor conservada del mundo. Fundada hacia 1150 por colonos sajones, vivió su esplendor comercial en los siglos XIV y XV. Lo excepcional es que su ciudadela amurallada sigue siendo residencial: hay vecinos viviendo hoy en las mismas casas medievales. Patrimonio de la Humanidad desde 1999 y bastante menos masificada que Brașov o Sibiu.</div>
+          <div class="place-tags"><span class="tag must">UNESCO</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Sighisoara+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🕰️</div>
+        <div class="place-text">
+          <div class="place-name">Torre del Reloj</div>
+          <div class="place-desc">Del siglo XIV, es el símbolo de la ciudadela y su antigua puerta principal. Alberga el museo de historia y desde lo alto se domina todo el conjunto de tejados y callejuelas.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Turnul+cu+Ceas+Sighisoara" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏠</div>
+        <div class="place-text">
+          <div class="place-name">Casa natal de Vlad III Drăculea</div>
+          <div class="place-desc">Aquí nació en 1431 el príncipe de Valaquia cuya ferocidad contra los invasores otomanos —empalaba a sus enemigos— inspiró siglos después la novela de Bram Stoker. La casa está en plena ciudadela, a pocos metros de la Torre del Reloj.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Casa+Vlad+Dracul+Sighisoara" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🪜</div>
+        <div class="place-text">
+          <div class="place-name">Pasaje de los Estudiantes e Iglesia de la Colina</div>
+          <div class="place-desc">La escalinata cubierta de madera que sube desde la ciudadela hasta la Iglesia de la Colina, el punto más alto de Sighișoara. Subirla de noche, cuando los turistas de día ya se han ido, es el mejor momento de la ciudad.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Scara+Acoperita+Sighisoara" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🎭</div>
+        <div class="place-text">
+          <div class="place-name">Festival Medieval de Sighișoara</div>
+          <div class="place-desc">Se celebra la segunda semana de julio. Si el viaje coincide, es una de las mejores experiencias posibles: la ciudadela entera vuelve a su época.</div>
+          <div class="place-tags"><span class="tag">Si coincide en fechas</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Cetatea+Sighisoara" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏯</div>
+        <div class="place-text">
+          <div class="place-name">Castillo de Corvin (Hunedoara)</div>
+          <div class="place-desc">Uno de los castillos góticos más impresionantes de Europa, pero está a unos 130 km al oeste de Sibiu, en dirección contraria al resto del viaje: supone unos 250 km extra y 4-5 horas de volante adicionales. Solo funciona planificándolo como día específico o como parada entre Sibiu y Cluj con pernoctación en ruta.</div>
+          <div class="place-tags"><span class="tag">Opcional · día maratoniano</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Castelul+Corvinilor+Hunedoara" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="placeholder-card" style="margin-top:14px">
+        <h4>🏨 Hotel Sighișoara — pendiente</h4>
+        <p>Reservar con semanas de antelación — la ciudadela tiene pocas plazas. Dormir dentro de las murallas es lo que hace especial esta parada.</p>
+      </div>
+      <div class="momento-box">
+        <div class="momento-label">✦ El momento del día</div>
+        <div class="momento-text">Las once de la noche, escalinata cubierta de Sighișoara. Los turistas de día se han ido. Las farolas de gas iluminan la madera medieval. El reloj de la torre da las campanadas. Las calles de la ciudadela son tuyas.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DÍA 8 -->
+  <div class="day-card" onclick="toggleDay(this)">
+    <div class="day-card-header">
+      <div class="day-num">8</div>
+      <div class="day-info">
+        <div class="day-title">El Corazón Joven de Transilvania</div>
+        <div class="day-sub">Sighișoara → Salina Turda → Cluj-Napoca</div>
+      </div>
+      <div class="day-chevron">›</div>
+    </div>
+    <div class="day-card-body">
+      <div class="day-route-pill">🚗 120 km · 2h 15 min · Transilvania</div>
+      <div class="places-label">Qué ver</div>
+      <div class="place-item">
+        <div class="place-icon">⛏️</div>
+        <div class="place-text">
+          <div class="place-name">Salina Turda</div>
+          <div class="place-desc">Mina de sal del siglo XI reconvertida en un espacio subterráneo alucinante a 120 metros de profundidad: un lago interior con barcas de remos, una noria del siglo XIX y una rueda panorámica bajo tierra. Está directamente en la ruta, 30 km antes de llegar a Cluj. Entrada ~60 lei. Llegar antes de las 10h o reservar entrada online para evitar colas en julio.</div>
+          <div class="place-tags"><span class="tag must">Imprescindible</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Salina+Turda+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏙️</div>
+        <div class="place-text">
+          <div class="place-name">Cluj-Napoca</div>
+          <div class="place-desc">Fundada como colonia romana con el nombre de Napoca en el siglo II d.C., fue Kolozsvár para los húngaros y Klausenburg para los alemanes: cuatro nombres que resumen siglos de convivencia y tensión. Hoy es la segunda ciudad del país, con más de 320.000 habitantes y más de 100.000 estudiantes universitarios, y la sede del festival UNTOLD en agosto. Su casco histórico es más irregular que el de Sibiu o Brașov, y ahí está su encanto.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Cluj-Napoca+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">⛪</div>
+        <div class="place-text">
+          <div class="place-name">Plaza Unirii y Catedral de San Miguel</div>
+          <div class="place-desc">El centro neurálgico de la ciudad: la catedral gótica tardía del siglo XIV y, delante, la estatua ecuestre de Matías Corvino, el rey húngaro nacido en esta ciudad.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Piata+Unirii+Cluj-Napoca" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🌿</div>
+        <div class="place-text">
+          <div class="place-name">Jardín Botánico de Cluj</div>
+          <div class="place-desc">Uno de los mayores de Europa del Este. Ideal para un paseo tranquilo antes del calor del mediodía, con invernaderos, jardín japonés y una torre mirador.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Gradina+Botanica+Cluj-Napoca" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏞️</div>
+        <div class="place-text">
+          <div class="place-name">Cheile Turzii</div>
+          <div class="place-desc">Desfiladero calizo a 30 km al sur de Cluj, con paredes de hasta 300 metros. La caminata dura 1,5-2 horas sobre puentes colgantes junto al río. Opcional, si la agenda del día lo permite.</div>
+          <div class="place-tags"><span class="tag">Desvío desde Cluj</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Cheile+Turzii+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🍽️</div>
+        <div class="place-text">
+          <div class="place-name">Cena en el barrio universitario</div>
+          <div class="place-desc">La zona de la universidad concentra restaurantes locales de excelente calidad-precio y el mejor ambiente nocturno del viaje hasta ahora.</div>
+          <div class="place-tags"><span class="tag">Cena</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Universitatea+Babes-Bolyai+Cluj-Napoca" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="placeholder-card" style="margin-top:14px">
+        <h4>🏨 Hotel Cluj-Napoca — pendiente</h4>
+        <p>Dos noches aquí. Añade nombre, dirección, código de reserva, check-in/out y teléfono cuando reserves.</p>
+      </div>
+      <div class="momento-box">
+        <div class="momento-label">✦ El momento del día</div>
+        <div class="momento-text">Dentro de la Salina Turda, 120 metros bajo tierra. Hay un lago. Una barquita cruza en silencio. El techo de sal brilla. El mundo de arriba no existe.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DÍA 9 -->
+  <div class="day-card" onclick="toggleDay(this)">
+    <div class="day-card-header">
+      <div class="day-num">9</div>
+      <div class="day-info">
+        <div class="day-title">El Norte que el Tiempo Olvidó</div>
+        <div class="day-sub">Cluj-Napoca → Maramureș</div>
+      </div>
+      <div class="day-chevron">›</div>
+    </div>
+    <div class="day-card-body">
+      <div class="day-route-pill">🚗 200 km · 3h 30 min · Transilvania · Maramureș</div>
+      <div class="places-label">Qué ver</div>
+      <div class="place-item">
+        <div class="place-icon">🛣️</div>
+        <div class="place-text">
+          <div class="place-name">La ruta hacia el norte</div>
+          <div class="place-desc">Hoy el paisaje cambia radicalmente: a medida que la carretera sube hacia Maramureș, los pueblos se vuelven más pequeños, los carros tirados por caballos más frecuentes y la modernidad más escasa. Las carreteras pierden calidad —dos carriles sin arcén y con baches—, así que hay que conducir con calma. El propio trayecto ya es parte de la experiencia.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Maramures+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏘️</div>
+        <div class="place-text">
+          <div class="place-name">Valle del Iza</div>
+          <div class="place-desc">La ruta de los pueblos de madera. Aldeas que no han cambiado en siglos en una región fronteriza que se mantuvo autónoma entre el reino húngaro, Moldavia y Valaquia — de ahí que sus tradiciones se hayan conservado como forma real de vida y no como parque temático. Lo mejor es detenerse sin destino fijo.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Valea+Izei+Maramures" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">⛪</div>
+        <div class="place-text">
+          <div class="place-name">Iglesias de madera UNESCO</div>
+          <div class="place-desc">Ocho iglesias de los siglos XVII-XVIII repartidas por el valle, Patrimonio de la Humanidad desde 1999. Existen porque el Imperio Austro-Húngaro prohibió a los ortodoxos construir en piedra: la comunidad respondió con torres de roble que alcanzan los 54 metros de altura, levantadas sin un solo clavo.</div>
+          <div class="place-tags"><span class="tag must">UNESCO</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Biserici+de+lemn+Maramures" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🧺</div>
+        <div class="place-text">
+          <div class="place-name">Mercado semanal de Sighetul Marmației</div>
+          <div class="place-desc">Los sábados. Productos locales, artesanía y vida real, sin puesta en escena para turistas. Merece ajustar el itinerario si las fechas cuadran.</div>
+          <div class="place-tags"><span class="tag">Solo sábados</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Sighetu+Marmatiei+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="placeholder-card" style="margin-top:14px">
+        <h4>🏨 Alojamiento Maramureș — pendiente</h4>
+        <p>Busca una pensiune familiar (gazda) en Breb, Șurdești o Budești: la hospitalidad aquí es legendaria y la mayoría incluye cena casera de kilómetro cero. Dos noches en la región. Añade datos cuando reserves.</p>
+      </div>
+      <div class="momento-box">
+        <div class="momento-label">✦ El momento del día</div>
+        <div class="momento-text">A última hora de la tarde, un carro tirado por caballos dobla la curva del camino de tierra. El granjero saluda con la cabeza. Los caballos no se inmutan. Es 2027 pero también es 1927.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DÍA 10 -->
+  <div class="day-card" onclick="toggleDay(this)">
+    <div class="day-card-header">
+      <div class="day-num">10</div>
+      <div class="day-info">
+        <div class="day-title">Madera, Madera y Madera</div>
+        <div class="day-sub">Maramureș — Tradición viva</div>
+      </div>
+      <div class="day-chevron">›</div>
+    </div>
+    <div class="day-card-body">
+      <div class="day-route-pill">🚗 120 km · 3h de ruta · Maramureș</div>
+      <div class="places-label">Qué ver</div>
+      <div class="place-item">
+        <div class="place-icon">🪦</div>
+        <div class="place-text">
+          <div class="place-name">Cimitirul Vesel de Săpânța</div>
+          <div class="place-desc">El Cementerio Alegre: cada lápida es una escultura de madera pintada de azul vivo con una ilustración y un poema en primera persona del difunto, a menudo con humor negro. Lo inició el tallista Stan Ioan Pătraș en 1935 y es una celebración de la vida única en el mundo.</div>
+          <div class="place-tags"><span class="tag must">Imprescindible</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Cimitirul+Vesel+Sapanta" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">⛪</div>
+        <div class="place-text">
+          <div class="place-name">Monasterio de Bârsana</div>
+          <div class="place-desc">El conjunto monástico de madera más espectacular de Maramureș, con frescos interiores de una calidad pictórica asombrosa y jardines cuidados al detalle.</div>
+          <div class="place-tags"><span class="tag must">No te lo saltes</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Manastirea+Barsana+Maramures" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🕯️</div>
+        <div class="place-text">
+          <div class="place-name">Iglesia de Desești</div>
+          <div class="place-desc">Una de las ocho iglesias de madera UNESCO del valle, con frescos interiores excepcionalmente bien conservados. Pequeña, oscura y muy alejada de cualquier circuito turístico.</div>
+          <div class="place-tags"><span class="tag must">UNESCO</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Biserica+de+lemn+Desesti" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🏘️</div>
+        <div class="place-text">
+          <div class="place-name">Pueblo de Breb</div>
+          <div class="place-desc">Considerado el pueblo más auténtico de toda Rumanía: casas de madera con portones tallados, huertos, y vecinos que todavía van a los mercados en traje tradicional. No hay nada montado para el visitante; simplemente es así.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Breb+Maramures+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🚂</div>
+        <div class="place-text">
+          <div class="place-name">Mocănița — Tren de vapor del Valle de Vaser</div>
+          <div class="place-desc">Tren forestal de vapor de principios del siglo XX que sube por el valle del Vaser durante unas 4 horas desde Vișeu de Sus. Es el último de Europa que funciona con regularidad y solo opera en temporada turística. RESERVAR CON SEMANAS DE ANTELACIÓN desde España: en julio las plazas se agotan.</div>
+          <div class="place-tags"><span class="tag must">Reservar ya</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=CFF+Viseu+de+Sus" target="_blank">📍 Abrir en Maps</a>
+          <a class="gps-btn" href="https://cffviseudesus.ro" target="_blank" style="margin-left:6px">🌐 Web oficial</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🧺</div>
+        <div class="place-text">
+          <div class="place-name">Mercado semanal de Sighetul Marmației</div>
+          <div class="place-desc">Los sábados. Si no se pudo encajar ayer, esta es la segunda oportunidad: productos locales, artesanía y vida real.</div>
+          <div class="place-tags"><span class="tag">Solo sábados</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Sighetu+Marmatiei+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="placeholder-card" style="margin-top:14px">
+        <h4>🏨 Alojamiento Maramureș (2ª noche) — pendiente</h4>
+        <p>Misma pensiune que el día 9 si son noches seguidas. Confirma que la reserva cubre las dos noches y si la cena está incluida.</p>
+      </div>
+      <div class="momento-box">
+        <div class="momento-label">✦ El momento del día</div>
+        <div class="momento-text">Delante de una lápida del Cimitirul Vesel. Hay un poema sobre un hombre al que le gustaba el vino y la música. La lápida tiene sus colores favoritos. Sus vecinos le querían. Te quedas más tiempo del que tenías previsto.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DÍA 11 -->
+  <div class="day-card" onclick="toggleDay(this)">
+    <div class="day-card-header">
+      <div class="day-num">11</div>
+      <div class="day-info">
+        <div class="day-title">El Desfiladero que Corta la Respiración</div>
+        <div class="day-sub">Cheile Bicazului y el Lago Rojo</div>
+      </div>
+      <div class="day-chevron">›</div>
+    </div>
+    <div class="day-card-body">
+      <div class="day-route-pill">🚗 180 km · 3h 45 min · Maramureș · Moldova · Bucovina</div>
+      <div class="places-label">Qué ver</div>
+      <div class="place-item">
+        <div class="place-icon">🏔️</div>
+        <div class="place-text">
+          <div class="place-name">Cheile Bicazului</div>
+          <div class="place-desc">Uno de los desfiladeros más impresionantes de Rumanía: paredes calizas verticales de hasta 300 metros que se cierran sobre la carretera durante 5 km creando un pasillo de roca casi claustrofóbico. Se formaron a lo largo de millones de años por la erosión del río Bicaz sobre la caliza.</div>
+          <div class="place-tags"><span class="tag must">Imprescindible</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Cheile+Bicazului+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🥾</div>
+        <div class="place-text">
+          <div class="place-name">Sendero por el interior de las gargantas</div>
+          <div class="place-desc">El camino junto al río es accesible y permite ver las paredes desde abajo, con otra perspectiva completamente distinta a la del coche. Mejor a primera hora, antes de que lleguen los autobuses.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Cheile+Bicazului+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🌊</div>
+        <div class="place-text">
+          <div class="place-name">Lacul Roșu (Lago Rojo)</div>
+          <div class="place-desc">En agosto de 1837 un desprendimiento del monte Ghilcoș bloqueó el río Bicaz y formó este lago. El nombre viene del tono rojizo que le daba el óxido de hierro de los afluentes. Los troncos del bosque que quedó inundado aún asoman sobre la superficie, con un aspecto fantasmal. Aparcamiento junto al lago y paseo en barca disponible.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Lacul+Rosu+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🧺</div>
+        <div class="place-text">
+          <div class="place-name">Puestos locales a la entrada del desfiladero</div>
+          <div class="place-desc">Artesanía, quesos de la zona y fruta. El descanso perfecto a mitad de jornada antes de seguir hacia el norte.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Cheile+Bicazului+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🚗</div>
+        <div class="place-text">
+          <div class="place-name">Subida hacia Bucovina</div>
+          <div class="place-desc">Al caer la tarde, continuar unos 120 km hacia el norte para dormir ya en la zona de Gura Humorului o Suceava, en el corazón de Bucovina. Así el día siguiente empieza junto a los monasterios y sin prisas de carretera.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Gura+Humorului+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="placeholder-card" style="margin-top:14px">
+        <h4>🏨 Alojamiento Bucovina — pendiente</h4>
+        <p>Zona de Gura Humorului o Suceava, para llegar a Voroneț al amanecer del día 12 sin madrugar en exceso. Añade nombre, dirección, código de reserva y teléfono cuando reserves.</p>
+      </div>
+      <div class="momento-box">
+        <div class="momento-label">✦ El momento del día</div>
+        <div class="momento-text">Dentro del desfiladero, el coche cabe justo. Las paredes suben 300 metros a ambos lados. El cielo es una franja azul estrecha muy arriba. El silencio es mineral.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DÍA 12 -->
+  <div class="day-card" onclick="toggleDay(this)">
+    <div class="day-card-header">
+      <div class="day-num">12</div>
+      <div class="day-info">
+        <div class="day-title">El Azul que No Se Puede Fotografiar</div>
+        <div class="day-sub">Bucovina → Regreso a Bucarest</div>
+      </div>
+      <div class="day-chevron">›</div>
+    </div>
+    <div class="day-card-body">
+      <div class="day-route-pill">🚗 430 km · 6h conducción · Bucovina · Muntenia</div>
+      <div class="places-label">Qué ver</div>
+      <div class="place-item">
+        <div class="place-icon">🎨</div>
+        <div class="place-text">
+          <div class="place-name">Mănăstirea Voroneț</div>
+          <div class="place-desc">Levantado en 1487 por Ștefan cel Mare, que mandaba construir una iglesia tras cada victoria sobre los otomanos. Lo llaman la "Capilla Sixtina de Oriente": el azul de Voroneț, obtenido con lapislázuli y otros minerales, sigue siendo imposible de reproducir con exactitud. La representación del Juicio Final en su fachada ocupa 6 metros de altura y es abrumadora. Ir al amanecer, antes de los grupos. Culto activo: vestimenta discreta obligatoria, entrada ~10 lei.</div>
+          <div class="place-tags"><span class="tag must">UNESCO · Amanecer</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Manastirea+Voronet+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">⛪</div>
+        <div class="place-text">
+          <div class="place-name">Mănăstirea Sucevița</div>
+          <div class="place-desc">De finales del siglo XVI, el más grande y mejor preservado del conjunto de monasterios pintados, dentro de un recinto amurallado. Sus frescos exteriores asombran por su viveza tras siglos a la intemperie, especialmente la Escalera del Paraíso de la fachada norte. Merece la pena contratar una guía local: sin explicación se pierden detalles fascinantes de estas "biblias de los pobres" pintadas para fieles analfabetos.</div>
+          <div class="place-tags"><span class="tag must">UNESCO</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Manastirea+Sucevita+Romania" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">🚗</div>
+        <div class="place-text">
+          <div class="place-name">Regreso a Bucarest por la DN2/E85</div>
+          <div class="place-desc">Unos 430 km y 5-6 horas de conducción. Salir de Bucovina antes de las 14h para llegar al aeropuerto OTP con margen y sin el estrés del tráfico de acceso a Bucarest. Devolver el coche de alquiler en las oficinas del terminal.</div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Aeroportul+Henri+Coanda+Otopeni" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="place-item">
+        <div class="place-icon">✈️</div>
+        <div class="place-text">
+          <div class="place-name">Vuelo de regreso OTP → ALC</div>
+          <div class="place-desc">Wizz Air, salida 06:45 y llegada a Alicante 09:30. Hay que estar en el aeropuerto a las 04:45. Facturar online desde 48 h antes: lo más cómodo es hacerlo la tarde anterior desde el hotel.</div>
+          <div class="place-tags"><span class="tag must">Madrugón</span></div>
+          <a class="gps-btn" href="https://maps.google.com/?q=Aeroportul+Henri+Coanda+Otopeni" target="_blank">📍 Abrir en Maps</a>
+        </div>
+      </div>
+      <div class="placeholder-card" style="margin-top:14px">
+        <h4>🏨 Hotel Bucarest (última noche) — pendiente</h4>
+        <p>Zona Aeropuerto OTP (Otopeni), con opciones económicas a 5-10 minutos del terminal — el vuelo sale a las 06:45. Añade nombre, dirección, código de reserva y teléfono cuando reserves.</p>
+      </div>
+      <div class="momento-box">
+        <div class="momento-label">✦ El momento del día</div>
+        <div class="momento-text">El amanecer en Voroneț. La luz rasante toca el muro y el azul aparece. No es azul cielo ni azul noche — es un azul que no tiene nombre en ningún otro idioma. Tu teléfono ya está guardado en el bolsillo.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ SCREEN: GASTRONOMÍA ══════════════════ -->
+<div id="screen-gastro" class="screen">
+  <div style="padding:16px">
+    <div class="screen-header">Gastronomía rumana</div>
+
+    <div class="gastro-section">
+      <div class="gastro-title">🍽️ Platos principales</div>
+      <div class="gastro-item">
+        <div class="gastro-emoji">🌽</div>
+        <div class="gastro-item-text"><h4>Mămăligă</h4><p>La polenta rumana. Base de la cocina tradicional, acompaña casi todo. Con queso y nata agria es un plato completo.</p></div>
+      </div>
+      <div class="gastro-item">
+        <div class="gastro-emoji">🥬</div>
+        <div class="gastro-item-text"><h4>Sarmale</h4><p>Hojas de col rellenas de carne picada y arroz, cocidas en caldo de tomate. El plato de domingo de Rumanía.</p></div>
+      </div>
+      <div class="gastro-item">
+        <div class="gastro-emoji">🌭</div>
+        <div class="gastro-item-text"><h4>Mici</h4><p>Pequeñas salchichas a la parrilla sin piel, con mezcla de especias y ajo. El fast food rumano que los locales defienden a muerte.</p></div>
+      </div>
+      <div class="gastro-item">
+        <div class="gastro-emoji">🍲</div>
+        <div class="gastro-item-text"><h4>Ciorbă</h4><p>Sopa agria con verduras y carne. Cada región tiene su variante. La de burtă (callos) es la más potente.</p></div>
+      </div>
+      <div class="gastro-item">
+        <div class="gastro-emoji">🍩</div>
+        <div class="gastro-item-text"><h4>Papanași</h4><p>Donut de queso frito con nata y mermelada de cereza. El postre por excelencia. Pedir siempre.</p></div>
+      </div>
+    </div>
+
+    <div class="gastro-section">
+      <div class="gastro-title">🍷 Vinos</div>
+      <div class="gastro-item">
+        <div class="gastro-emoji">🍷</div>
+        <div class="gastro-item-text"><h4>Fetească Neagră</h4><p>El tinto rumano por excelencia. Uva autóctona, fruta oscura y taninos suaves. Pedir siempre sobre el vino importado.</p></div>
+      </div>
+      <div class="gastro-item">
+        <div class="gastro-emoji">🥂</div>
+        <div class="gastro-item-text"><h4>Grasă de Cotnari</h4><p>Blanco dulce del noreste, con notas de miel y membrillo. Vino de postre histórico, siglos XV.</p></div>
+      </div>
+      <div class="gastro-item">
+        <div class="gastro-emoji">🍾</div>
+        <div class="gastro-item-text"><h4>Tămâioasă românească</h4><p>Blanco aromático con notas de moscatel. Producido en Dealu Mare y Valle del Danubio.</p></div>
+      </div>
+    </div>
+
+    <div class="gastro-section">
+      <div class="gastro-title">🥤 Sin alcohol</div>
+      <div class="gastro-item">
+        <div class="gastro-emoji">💧</div>
+        <div class="gastro-item-text"><h4>Apă minerală</h4><p>Rumanía tiene aguas minerales excelentes y muy baratas. Borsec y Harghita son las más conocidas.</p></div>
+      </div>
+      <div class="gastro-item">
+        <div class="gastro-emoji">🍋</div>
+        <div class="gastro-item-text"><h4>Limonadă</h4><p>Limonada artesanal, en bares y terrazas. Muy refrescante en verano, con hierbas frescas.</p></div>
+      </div>
+      <div class="gastro-item">
+        <div class="gastro-emoji">🌸</div>
+        <div class="gastro-item-text"><h4>Socată</h4><p>Refresco artesanal de flor de saúco. Típico de julio. Ligeramente fermentado, muy aromático.</p></div>
+      </div>
+    </div>
+
+    <div class="gastro-section">
+      <div class="gastro-title">🍰 Dulces</div>
+      <div class="gastro-item">
+        <div class="gastro-emoji">🥐</div>
+        <div class="gastro-item-text"><h4>Cozonac</h4><p>Brioche dulce relleno de nueces, cacao o amapola. Omnipresente en panaderías.</p></div>
+      </div>
+      <div class="gastro-item">
+        <div class="gastro-emoji">🎂</div>
+        <div class="gastro-item-text"><h4>Savarina</h4><p>Bizcocho empapado en almíbar de ron con nata. El pastel de las pastelerías de ciudad.</p></div>
+      </div>
+      <div class="gastro-item">
+        <div class="gastro-emoji">🥞</div>
+        <div class="gastro-item-text"><h4>Plăcintă</h4><p>Masa fina rellena dulce o salada. Cada región tiene su variante. La de queso fresco y eneldo es la más típica.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ SCREEN: INFO ══════════════════ -->
+<div id="screen-info" class="screen">
+  <div style="padding:16px">
+    <div class="screen-header">Info práctica</div>
+
+    <div class="info-card">
+      <h3>🚗 Carretera</h3>
+      <div class="info-item">
+        <div class="info-item-icon">🏷️</div>
+        <div class="info-item-text"><strong>Rovinieta OBLIGATORIA</strong> — Viñeta de carretera. Comprar online antes de entrar en <a href="https://www.roviniete.ro" target="_blank">roviniete.ro</a> o en gasolinera al entrar. Sin ella: multa inmediata.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon">📱</div>
+        <div class="info-item-text"><strong>RO-Alert</strong> — Sistema de alertas del gobierno rumano. Activar al llegar. Avisa de condiciones meteorológicas extremas y emergencias.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon">⛽</div>
+        <div class="info-item-text">Llenar depósito al salir de ciudades grandes. Las zonas rurales (Maramureș, Bucovina) tienen pocas gasolineras.</div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3>🐻 Osos en los Cárpatos</h3>
+      <div class="warn-box">
+        <p>Rumanía tiene la mayor población de osos pardos de Europa. La presencia en rutas de montaña es real, no anecdótica.</p>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon">❌</div>
+        <div class="info-item-text">No alimentar, no acercarse, no dejar comida en el coche visible.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon">📞</div>
+        <div class="info-item-text"><strong>Salvamont</strong> — Servicio de rescate de montaña: <a href="tel:0SALVAMONT">0-SALVAMONT</a> (0725 826 668). Guardar en el teléfono antes de subir a montaña.</div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3>📅 Qué reservar antes</h3>
+      <div class="info-item">
+        <div class="info-item-icon">✈️</div>
+        <div class="info-item-text"><strong>Meses antes:</strong> vuelos, coche de alquiler (julio = temporada alta), Mocănița (cffviseudesus.ro)</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon">🏨</div>
+        <div class="info-item-text"><strong>Semanas antes:</strong> hoteles en Brașov, Sibiu, Sighișoara, Cluj. Se llenan en verano.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon">🎯</div>
+        <div class="info-item-text"><strong>Al llegar:</strong> restaurantes locales, resto de actividades. Deja margen para lo espontáneo.</div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3>⚠️ Errores a evitar</h3>
+      <div class="info-item">
+        <div class="info-item-icon">🚗</div>
+        <div class="info-item-text">No subestimar los tiempos de conducción — las carreteras rurales son lentas aunque el mapa parezca corto.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon">🏰</div>
+        <div class="info-item-text">No ir a Bran esperando el castillo de Drácula — es una trampa turística cara. Peleș es diez veces mejor.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon">🌄</div>
+        <div class="info-item-text">No cruzar la Transfăgărășan de tarde — la niebla cubre la cumbre al mediodía. Salir a primera hora.</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon">💶</div>
+        <div class="info-item-text">Llevar siempre algo de efectivo (Lei rumanos) — muchos pueblos y restaurantes rurales no tienen TPV.</div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3>🗣️ Frases en rumano</h3>
+      <div class="phrase-item">
+        <div>
+          <div class="phrase-ro">Mulțumesc</div>
+          <div class="phrase-es">Gracias</div>
+          <div class="phrase-pron">mul-tsoo-MESK</div>
+        </div>
+      </div>
+      <div class="phrase-item">
+        <div>
+          <div class="phrase-ro">Bună ziua</div>
+          <div class="phrase-es">Buenos días / Buenas tardes</div>
+          <div class="phrase-pron">BOO-nuh ZEE-wah</div>
+        </div>
+      </div>
+      <div class="phrase-item">
+        <div>
+          <div class="phrase-ro">Cât costă?</div>
+          <div class="phrase-es">¿Cuánto cuesta?</div>
+          <div class="phrase-pron">kuht KOS-tuh</div>
+        </div>
+      </div>
+      <div class="phrase-item">
+        <div>
+          <div class="phrase-ro">Un meniu, vă rog</div>
+          <div class="phrase-es">La carta, por favor</div>
+          <div class="phrase-pron">oon MEN-yoo, vuh ROG</div>
+        </div>
+      </div>
+      <div class="phrase-item">
+        <div>
+          <div class="phrase-ro">Noroc!</div>
+          <div class="phrase-es">¡Salud! (al brindar)</div>
+          <div class="phrase-pron">no-ROK</div>
+        </div>
+      </div>
+      <div class="phrase-item">
+        <div>
+          <div class="phrase-ro">Unde este...?</div>
+          <div class="phrase-es">¿Dónde está...?</div>
+          <div class="phrase-pron">OON-deh YES-teh</div>
+        </div>
+      </div>
+      <div class="phrase-item">
+        <div>
+          <div class="phrase-ro">Scuze</div>
+          <div class="phrase-es">Perdona / Disculpa</div>
+          <div class="phrase-pron">SKOO-zeh</div>
+        </div>
+      </div>
+      <div class="phrase-item">
+        <div>
+          <div class="phrase-ro">Nu înțeleg</div>
+          <div class="phrase-es">No entiendo</div>
+          <div class="phrase-pron">noo uhn-TSEL-eg</div>
+        </div>
+      </div>
+      <div class="phrase-item">
+        <div>
+          <div class="phrase-ro">Vorbiți engleză?</div>
+          <div class="phrase-es">¿Habla inglés?</div>
+          <div class="phrase-pron">vor-BEETS eng-LEH-zuh</div>
+        </div>
+      </div>
+      <div class="phrase-item">
+        <div>
+          <div class="phrase-ro">Nota, vă rog</div>
+          <div class="phrase-es">La cuenta, por favor</div>
+          <div class="phrase-pron">NO-tah, vuh ROG</div>
+        </div>
+      </div>
+      <div class="phrase-item">
+        <div>
+          <div class="phrase-ro">Frumos!</div>
+          <div class="phrase-es">¡Precioso! / ¡Qué bonito!</div>
+          <div class="phrase-pron">froo-MOS</div>
+        </div>
+      </div>
+      <div class="phrase-item">
+        <div>
+          <div class="phrase-ro">La revedere</div>
+          <div class="phrase-es">Hasta luego / Adiós</div>
+          <div class="phrase-pron">lah reh-veh-DEH-reh</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════ BOTTOM NAV ══════════════════ -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-home" onclick="goTo('home')">
+    <span>🏠</span><small>Inicio</small>
+  </button>
+  <button class="nav-btn" id="nav-dias" onclick="goTo('dias')">
+    <span>🗺️</span><small>Días</small>
+  </button>
+  <button class="nav-btn" id="nav-gastro" onclick="goTo('gastro')">
+    <span>🍽️</span><small>Gastro</small>
+  </button>
+  <button class="nav-btn" id="nav-info" onclick="goTo('info')">
+    <span>🧭</span><small>Info</small>
+  </button>
+</nav>
+
+<script>
+  // ── Navigation ──
+  function goTo(tab) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('screen-' + tab).classList.add('active');
+    document.getElementById('nav-' + tab).classList.add('active');
+    document.getElementById('screen-' + tab).scrollTop = 0;
+  }
+
+  // ── Day accordion ──
+  function toggleDay(card) {
+    const isOpen = card.classList.contains('open');
+    document.querySelectorAll('.day-card.open').forEach(c => c.classList.remove('open'));
+    if (!isOpen) card.classList.add('open');
+  }
+
+  // ── PWA: inline manifest ──
+  const manifest = {
+    name: "El Secreto de los Cárpatos",
+    short_name: "Cárpatos",
+    description: "Guía de viaje · Rumanía julio 2027",
+    start_url: ".",
+    display: "standalone",
+    background_color: "#1B2A4A",
+    theme_color: "#1B2A4A",
+    icons: [{
+      src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231B2A4A' rx='20'/><text y='.9em' font-size='80' x='10'>🏔️</text></svg>",
+      sizes: "any", type: "image/svg+xml"
+    }]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'});
+  document.getElementById('manifest-link').href = URL.createObjectURL(blob);
+
+  // ── Service Worker (cache offline) ──
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+      const CACHE = 'carpatos-v1';
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/'])));
+        self.skipWaiting();
+      });
+      self.addEventListener('fetch', e => {
+        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+      });
+    `;
+    const swBlob = new Blob([swCode], {type: 'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob));
+  }
+</script>
+</body>
+</html>
