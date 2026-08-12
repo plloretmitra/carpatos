@@ -7,6 +7,7 @@ const {
 } = docx;
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 // ── PALETTE ────────────────────────────────────────────────────────
 const C = {
@@ -250,6 +251,13 @@ function dayHeaderCell(num, title, subtitle, km = null, regions = null) {
         ...regionPara,
       ]
   });
+}
+
+// Salto de página antes de un día. Va en un párrafo propio porque una tabla
+// no admite pageBreakBefore. El día 1 no lo lleva: viene justo detrás del
+// encabezado de la sección del itinerario.
+function dayPageBreak() {
+  return new Paragraph({ pageBreakBefore: true, spacing: { after: 0 } });
 }
 
 // ── DAY BLOCK ──────────────────────────────────────────────────────
@@ -598,6 +606,7 @@ const sections = [
       empty(160),
 
       // ── DÍA 2 ──
+      dayPageBreak(),
       dayBlock(2, "La Puerta de los Cárpatos", "Bucarest → Sinaia → Brașov", "154 km · 2h 30 min", "Muntenia · Transilvania",
         "Sinaia: el retiro real que nació de un monasterio",
         "El Valle de Prahova fue durante siglos la puerta natural entre Valaquia y Transilvania. El Monasterio de Sinaia fue fundado en 1695 por el noble Mihai Cantacuzino, quien lo dedicó al Monte Sinaí donde había peregrinado. Cuando el rey Carol I descubrió el valle en 1866, mandó construir el Castillo de Peleș, convirtiendo el lugar en el 'Biarritz rumano'. Brașov, fundada en 1211 por los Caballeros Teutónicos, fue durante siglos el mayor centro comercial del sudeste de Europa."
@@ -617,6 +626,7 @@ const sections = [
       empty(160),
 
       // ── DÍA 3 ──
+      dayPageBreak(),
       dayBlock(3, "Entre Osos y Campanarios", "Brașov — La ciudad sajona", "día de base", "Transilvania",
         "Brașov: Kronstadt, la ciudad que tres pueblos construyeron",
         "Los sajones llamados por el rey húngaro Géza II en el siglo XII levantaron Kronstadt como bastión comercial y militar. La Iglesia Negra —renombrada así tras el gran incendio de 1689— es la mayor iglesia gótica de Europa central al sur de los Alpes. Junto a sajones y húngaros, los valacos habitaban el barrio de Șchei, fuera de las murallas. Tras la caída del comunismo, la mayoría de los sajones transilvanos emigró a Alemania entre 1990 y 2000."
@@ -641,6 +651,7 @@ const sections = [
       empty(160),
 
       // ── DÍA 4 ──
+      dayPageBreak(),
       dayBlock(4, "La Ruta que Conquistó el Mundo", "La Carretera Transfăgărășan", "133 km · 3h 30 min", "Transilvania",
         "La Transfăgărășan: la carretera que nació del miedo",
         "Ceaușescu ordenó construir la Transfăgărășan entre 1970 y 1974 tras la invasión soviética de Checoslovaquia en 1968: necesitaba una ruta militar alternativa a través de los Cárpatos. La construcción requirió 6.000 toneladas de dinamita y costó la vida a decenas de trabajadores. Jeremy Clarkson la declaró 'la mejor carretera del mundo' en Top Gear (2009). Solo está abierta de junio a octubre."
@@ -659,6 +670,7 @@ const sections = [
       empty(160),
 
       // ── DÍA 5 ──
+      dayPageBreak(),
       dayBlock(5, "El Otro Lado", "Transfăgărășan → Curtea de Argeș → Sibiu", "100 km · 2h 15 min", "Transilvania · Muntenia · Oltenia",
         "Sibiu: la capital de la Sajonia transilvana",
         "Sibiu (Hermannstadt en alemán) fue fundada en el siglo XII por colonos sajones convocados por la corona húngara. Entre 1692 y 1791 fue capital del principado de Transilvania. Su detalle más singular son los 'ojos de Sibiu': ventanas de buhardilla con forma de párpado inclinado que permitían ventilar los graneros y vigilar la calle. En 2007 fue Capital Europea de la Cultura junto con Luxemburgo."
@@ -681,6 +693,7 @@ const sections = [
       empty(160),
 
       // ── DÍA 6 ──
+      dayPageBreak(),
       dayBlock(6, "La Ciudad de los Ojos", "Sibiu — Profundidad y calma", "día de base", "Transilvania",
         "El legado sajón: por qué Sibiu tiene tres plazas y 'ojos' en los tejados",
         "La topografía de Sibiu —ciudad alta (intramuros) y ciudad baja (comercial)— refleja la estructura social medieval. Las ventanas de buhardilla con forma de ojo son un elemento funcional: un ojo de buey inclinado hacia abajo para ventilar y vigilar. Tras la reunificación alemana, la mayor parte de la comunidad sajona (unos 40.000 habitantes en 1989) emigró a Alemania en apenas diez años."
@@ -697,6 +710,7 @@ const sections = [
       empty(160),
 
       // ── DÍA 7 ──
+      dayPageBreak(),
       dayBlock(7, "Donde Nació el Mito", "Sibiu → Biertan → Sighișoara", "130 km · 2h 30 min", "Transilvania",
         "Sighișoara: la cuna de Vlad III y la ciudadela que el tiempo no tocó",
         "Fundada hacia 1150 por colonos sajones, Sighișoara alcanzó su esplendor como ciudad comercial en los siglos XIV y XV. En 1431 nació aquí Vlad III Drăculea, príncipe de Valaquia cuya ferocidad contra los invasores otomanos —empalaba a sus enemigos— inspiró la novela de Bram Stoker. La Torre del Reloj data del siglo XIV. Lo excepcional de Sighișoara es que su ciudadela amurallada sigue siendo residencial: vecinos reales viven hoy en las mismas casas medievales. La UNESCO la declaró Patrimonio de la Humanidad en 1999."
@@ -717,6 +731,7 @@ const sections = [
       empty(160),
 
       // ── DÍA 8 ──
+      dayPageBreak(),
       dayBlock(8, "El Corazón Joven de Transilvania", "Sighișoara → Salina Turda → Cluj-Napoca", "120 km · 2h 15 min", "Transilvania",
         "Cluj-Napoca: cuatro nombres y veinte siglos de historia",
         "La ciudad fue fundada como colonia romana con el nombre de Napoca en el siglo II d.C. Los húngaros la llamaron Kolozsvár, los alemanes Klausenburg y los rumanos Cluj. Esta multiplicidad de nombres refleja siglos de convivencia y tensión entre comunidades. Capital histórica del principado de Transilvania, hoy es la segunda ciudad de Rumanía con más de 320.000 habitantes y más de 100.000 estudiantes universitarios."
@@ -734,6 +749,7 @@ const sections = [
       empty(160),
 
       // ── DÍA 9 ──
+      dayPageBreak(),
       dayBlock(9, "El Norte que el Tiempo Olvidó", "Cluj-Napoca → Maramureș", "200 km · 3h 30 min", "Transilvania · Maramureș",
         "Maramureș: la región que sobrevivió entre imperios",
         "Esta región fronteriza del norte fue durante siglos disputada entre el reino húngaro, Moldavia y Valaquia. Sus habitantes conservaron una notable autonomía frente a los grandes imperios, lo que explica que sus tradiciones, arquitectura en madera y ritos se hayan preservado de forma tan orgánica: no como un parque temático, sino como forma real de vida."
@@ -751,6 +767,7 @@ const sections = [
       empty(160),
 
       // ── DÍA 10 ──
+      dayPageBreak(),
       dayBlock(10, "Madera, Madera y Madera", "Maramureș — Iglesias centenarias y tradición viva", "120 km · 3h de ruta", "Maramureș",
         "Las iglesias de madera: la respuesta a una prohibición",
         "Las iglesias de madera de Maramureș son, en parte, consecuencia de una imposición del Imperio Austro-Húngaro que prohibió a los ortodoxos construir iglesias en piedra. La comunidad respondió con torres de madera de roble que en algunos casos alcanzan los 54 metros de altura, construidas sin un solo clavo. Ocho de ellas están declaradas Patrimonio de la Humanidad por la UNESCO desde 1999."
@@ -769,6 +786,7 @@ const sections = [
       empty(160),
 
       // ── DÍA 11 ──
+      dayPageBreak(),
       dayBlock(11, "El Desfiladero que Corta la Respiración", "Cheile Bicazului y el Lago Rojo", "180 km · 3h 45 min", "Maramureș · Moldova · Bucovina",
         "El Lago Rojo: cuando una montaña decidió taponar un río",
         "En agosto de 1837, un desprendimiento del monte Ghilcoș bloqueó el río Bicaz, formando el Lago Rojo. El nombre proviene del color rojizo que adquirían sus aguas teñidas por el óxido de hierro de los afluentes. Los troncos del bosque inundado aún asoman sobre la superficie, creando una imagen fantasmal. Las Gargantas de Bicaz se formaron a lo largo de millones de años por erosión del río sobre la roca caliza, con paredes de hasta 300 metros."
@@ -786,6 +804,7 @@ const sections = [
       empty(160),
 
       // ── DÍA 12 ──
+      dayPageBreak(),
       dayBlock(12, "El Azul que No Se Puede Fotografiar", "Bucovina — Voroneț y Sucevița — Regreso a Bucarest", "430 km · 6h de conducción", "Bucovina · Muntenia",
         "Los monasterios pintados: una biblia al aire libre",
         "Los monasterios pintados de Bucovina fueron construidos entre 1487 y 1583 por los príncipes moldavos, especialmente Ștefan cel Mare (Esteban el Grande), quien mandó levantar una iglesia tras cada victoria militar sobre los otomanos. Los frescos exteriores eran la 'biblia de los pobres' para fieles analfabetos. El azul de Voroneț, obtenido con lapislázuli y otros minerales, sigue siendo imposible de reproducir con exactitud."
@@ -1223,4 +1242,9 @@ const doc = new Document({ sections });
 Packer.toBuffer(doc).then(buffer => {
   fs.writeFileSync('./rumania_guia_viaje.docx', buffer);
   console.log('Documento generado: ./rumania_guia_viaje.docx');
+
+  // Exportación automática a PDF con LibreOffice, para poder revisar el
+  // maquetado sin pasos manuales.
+  execSync('soffice --headless --convert-to pdf ./rumania_guia_viaje.docx', { stdio: 'ignore' });
+  console.log('PDF generado: ./rumania_guia_viaje.pdf');
 });
