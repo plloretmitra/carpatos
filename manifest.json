@@ -1,6 +1,7 @@
 {
   "name": "El Secreto de los Cárpatos",
   "short_name": "Cárpatos",
+  "description": "Guía de viaje · Rumanía julio 2027",
   "display": "standalone",
   "start_url": "carpatos_pwa.html",
   "background_color": "#1B2A4A",
