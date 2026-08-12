@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Cárpatos">
-  <link id="manifest-link" rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22El%20Secreto%20de%20los%20C%C3%A1rpatos%22%2C%22short_name%22%3A%22C%C3%A1rpatos%22%2C%22display%22%3A%22standalone%22%2C%22start_url%22%3A%22.%22%2C%22background_color%22%3A%22%231B2A4A%22%2C%22theme_color%22%3A%22%231B2A4A%22%2C%22orientation%22%3A%22portrait%22%7D">
+  <link id="manifest-link" rel="manifest" href="manifest.json">
   <title>El Secreto de los Cárpatos</title>
   <style>
     :root {
@@ -1394,23 +1394,6 @@
     document.querySelectorAll('.day-card.open').forEach(c => c.classList.remove('open'));
     if (!isOpen) card.classList.add('open');
   }
-
-  // ── PWA: inline manifest ──
-  const manifest = {
-    name: "El Secreto de los Cárpatos",
-    short_name: "Cárpatos",
-    description: "Guía de viaje · Rumanía julio 2027",
-    start_url: ".",
-    display: "standalone",
-    background_color: "#1B2A4A",
-    theme_color: "#1B2A4A",
-    icons: [{
-      src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231B2A4A' rx='20'/><text y='.9em' font-size='80' x='10'>🏔️</text></svg>",
-      sizes: "any", type: "image/svg+xml"
-    }]
-  };
-  const blob = new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'});
-  document.getElementById('manifest-link').href = URL.createObjectURL(blob);
 
   // ── Service Worker (cache offline) ──
   if ('serviceWorker' in navigator) {

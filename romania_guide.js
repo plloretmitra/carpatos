@@ -6,6 +6,7 @@ const {
   ShadingType, BorderStyle, PageBreak, ImageRun
 } = docx;
 const fs = require('fs');
+const path = require('path');
 
 // ── PALETTE ────────────────────────────────────────────────────────
 const C = {
@@ -323,7 +324,7 @@ function budgetTable(rows) {
 
 // ── COVER PAGE ─────────────────────────────────────────────────────
 function buildCover() {
-  const illustrationData = fs.readFileSync('/home/pablo/projects/Cárpatos/Docs/0b90d467-Gemini_Generated_Image_z9kjhez9kjhez9kj.png');
+  const illustrationData = fs.readFileSync(path.join(__dirname, '0b90d467-Gemini_Generated_Image_z9kjhez9kjhez9kj.png'));
 
   return [
     new Table({
