@@ -84,3 +84,64 @@ Una vez cerrada la guía Word, se puede convertir en una Progressive Web App (PW
 - Añade interactividad: enlaces GPS a Google Maps, datos de hotel y vuelo, check-lists
 - No requiere compilación ni publicación en Google Play
 - Los datos de hotel, vuelo y reservas se incorporan conforme se van confirmando
+
+---
+
+## 9. La PWA en producción
+
+### Qué es y qué contiene
+
+Dos ficheros, nada más:
+
+- **`carpatos_pwa.html`** — la aplicación entera en un solo fichero: estructura, estilos, contenido y lógica. Sin dependencias externas ni build.
+- **`manifest.json`** — fichero separado con el nombre, el icono, los colores y el modo de visualización. Es lo que permite instalarla como app.
+
+El contenido sale del mismo material que el Word: los 12 días con sus lugares y descripciones, más gastronomía e información práctica.
+
+### URL de producción
+
+```
+https://plloretmitra.github.io/carpatos/carpatos_pwa.html
+```
+
+Servida por GitHub Pages desde la rama `master`, raíz del repositorio. La raíz del sitio devuelve 404 porque no hay `index.html`: hay que usar la URL completa. Renombrar el fichero a `index.html` la acortaría a `https://plloretmitra.github.io/carpatos/`.
+
+### Estructura de navegación
+
+Cuatro pestañas en una barra inferior fija:
+
+| Pestaña | Contenido |
+|---|---|
+| 🏠 **Inicio** | Portada, datos del viaje, tarjeta de vuelo y accesos a las otras secciones |
+| 🗺️ **Días** | Los 12 días. Cada uno se despliega y muestra la ruta, todos los lugares con descripción y enlace a Google Maps, la tarjeta de hotel y "el momento del día" |
+| 🍽️ **Gastro** | Platos principales, quesos, vinos, destilados, bebidas sin alcohol y dulces |
+| 🧭 **Info** | Logística, frases útiles, qué reservar con antelación y errores a evitar |
+
+### Cómo actualizar el contenido
+
+1. Editar `carpatos_pwa.html` (o `manifest.json`) en Claude Code
+2. `git add`, `git commit`, `git push`
+3. GitHub Pages despliega solo en unos 2 minutos
+
+No hay que compilar nada. Si el móvil sigue mostrando la versión antigua, es la caché del Service Worker: cerrar la app y volver a abrirla, o subir el número de versión de la caché en el código.
+
+### Cómo instalarla en el móvil
+
+1. Abrir la URL de producción en Chrome
+2. Menú de tres puntos → **Añadir a pantalla de inicio**
+3. Se instala como app: icono propio, sin barra de navegador y con acceso offline
+
+### Lecciones aprendidas
+
+- **El manifest tiene que ser un fichero real servido por HTTP.** Ni los `data:` URI ni los blob URL funcionan en Chrome Android para el modo standalone. Se probaron las tres vías y solo la tercera instala la app correctamente.
+- **Cuidado con el orden del JavaScript.** El Service Worker va embebido en el propio HTML como blob URL, y durante la sesión no llegaba a registrarse nunca: el bloque de manifest inline que lo precedía hacía `document.getElementById('manifest-link').href = ...` sobre un elemento que no existía en el DOM. `getElementById` devolvía `null`, el TypeError cortaba el script en seco y el registro del Service Worker, que venía justo después, no se ejecutaba. Al pasar al `manifest.json` real ese bloque desapareció y con él el problema. Moraleja: un error de JavaScript no rompe solo su línea, mata todo lo que viene detrás.
+- **Con `file://` no funciona nada.** Ni manifest ni Service Worker ni instalación. La PWA hay que servirla por HTTP sí o sí, aunque sea para probarla.
+- **El repositorio solo lleva fuentes.** `node_modules/`, `*.docx`, `*.pdf` y `pagina-*.jpg` están en `.gitignore`: las dependencias se reinstalan con `npm install` y el Word y sus imágenes de verificación se regeneran con el script.
+
+### Repositorio
+
+```
+git@github.com:plloretmitra/carpatos.git    rama master
+```
+
+Ocho ficheros: la PWA y su manifest, el generador del Word, la imagen de portada, esta metodología, los dos `package*.json` y el `.gitignore`.
