@@ -860,6 +860,7 @@ const sections = [
       subsectionHead("Las bebidas"),
       body("La pálinca merece un párrafo aparte. Este aguardiente destilado de ciruelas, peras, albaricoques o manzanas es el lubricante social de toda Rumanía, pero especialmente del norte del país. Los artesanales caseros —ilegales técnicamente, habituales en la práctica— pueden superar el 60% de alcohol y tienen una complejidad aromática que la versión comercial no alcanza. En cualquier casa rural de Maramureș o Bucovina, el primer gesto de hospitalidad es un vasito de pálinca. Rechazarlo es una descortesía."),
       empty(80),
+      bullet("Țuică — Aguardiente de ciruelas más extendido fuera del norte. Más joven y suave que la pálinca, con menos graduación. Se sirve solo, a temperatura ambiente, antes de las comidas. Es la versión más accesible para quien no está acostumbrado a los destilados caseros."),
       bullet("Cerveza — Excelente y barata. Ursus, Timișoreana (desde 1718) y Ciuc son las marcas más extendidas. Precio en bar: 1,50-2 €. En julio, imprescindible tener siempre una fría a mano."),
       bullet("Vino — Los vinos rumanos son uno de los secretos mejor guardados de Europa del Este. Las regiones de Dealu Mare (tintos de Fetească Neagră, potentes y afrutados) y Cotnari (blancos aromáticos de Grasă y Tămâioasă) producen botellas que aguantan perfectamente la comparación con vinos del sur de Francia a un tercio del precio. Pedir siempre vino de producción local en los restaurantes: suele ser mejor que las marcas de supermercado."),
       empty(120),
@@ -879,7 +880,7 @@ const sections = [
       bullet("Cozonac — El pan dulce de las fiestas, esponjoso y enriquecido con nueces, cacao o semillas de amapola. En Bucovina lo hacen las abuelas mejor que ninguna panadería. Si te lo ofrecen en una casa rural, es una señal de hospitalidad de primer orden."),
       bullet("Savarina — Bizcocho empapado en almíbar de ron con nata montada. Herencia de la repostería francesa del siglo XIX que llegó a Rumanía a través de la influencia parisina de la burguesía valaca. Se encuentra en cafeterías de Bucarest y Cluj."),
       bullet("Gogoși — Donuts fritos rellenos de mermelada o crema. Omnipresentes en mercados y ferias. El olor a masa frita en el mercado de Sighetul un sábado por la mañana es una de esas memorias olfativas del viaje."),
-      bullet("Plăcintă — Pastel de masa fina relleno de queso (brânzä), espinacas, manzana o cereza, según la región. La versión de Maramureș (con queso y eneldo) es especialmente buena. Se vende en trozos grandes por poquísimo dinero."),
+      bullet("Plăcintă — Pastel de masa fina relleno de queso (brânză), espinacas, manzana o cereza, según la región. La versión de Maramureș (con queso y eneldo) es especialmente buena. Se vende en trozos grandes por poquísimo dinero."),
       empty(120),
 
       infoBox("En la ruta: dónde comer bien", [
