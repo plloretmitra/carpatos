@@ -91,57 +91,59 @@ Una vez cerrada la guía Word, se puede convertir en una Progressive Web App (PW
 
 ### Qué es y qué contiene
 
-Dos ficheros, nada más:
+Dos ficheros:
 
-- **`carpatos_pwa.html`** — la aplicación entera en un solo fichero: estructura, estilos, contenido y lógica. Sin dependencias externas ni build.
-- **`manifest.json`** — fichero separado con el nombre, el icono, los colores y el modo de visualización. Es lo que permite instalarla como app.
+- **`<nombre>.html`** — la aplicación entera: estructura, estilos, contenido y lógica en un solo fichero. Sin dependencias externas ni build step.
+- **`manifest.json`** — nombre, icono, colores y modo de visualización. Es lo que permite instalarla como app standalone.
 
-El contenido sale del mismo material que el Word: los 12 días con sus lugares y descripciones, más gastronomía e información práctica.
+El contenido sale del mismo material que el Word: los días con sus lugares y descripciones, más las secciones complementarias (gastronomía, logística, etc.).
 
 ### URL de producción
 
 ```
-https://plloretmitra.github.io/carpatos/carpatos_pwa.html
+https://<usuario>.github.io/<repo>/<nombre>.html
 ```
 
-Servida por GitHub Pages desde la rama `master`, raíz del repositorio. La raíz del sitio devuelve 404 porque no hay `index.html`: hay que usar la URL completa. Renombrar el fichero a `index.html` la acortaría a `https://plloretmitra.github.io/carpatos/`.
+Servida por GitHub Pages desde la rama `master`, raíz del repositorio. Si el HTML se llama `index.html` la URL se acorta a `https://<usuario>.github.io/<repo>/`.
 
-### Estructura de navegación
+### Estructura de navegación típica
 
-Cuatro pestañas en una barra inferior fija:
+Una barra de navegación inferior fija con 3-5 pestañas:
 
-| Pestaña | Contenido |
-|---|---|
-| 🏠 **Inicio** | Portada, datos del viaje, tarjeta de vuelo y accesos a las otras secciones |
-| 🗺️ **Días** | Los 12 días. Cada uno se despliega y muestra la ruta, todos los lugares con descripción y enlace a Google Maps, la tarjeta de hotel y "el momento del día" |
-| 🍽️ **Gastro** | Platos principales, quesos, vinos, destilados, bebidas sin alcohol y dulces |
-| 🧭 **Info** | Logística, frases útiles, qué reservar con antelación y errores a evitar |
+- **Inicio** — portada con los datos clave del viaje y accesos a las otras secciones
+- **Días** — el itinerario día a día, desplegable, con lugares, descripciones y hotel
+- **Gastro** — gastronomía local organizada por categorías
+- **Info** — logística, frases útiles, qué reservar con antelación, errores a evitar
+
+Cada viaje puede añadir o quitar pestañas según el destino.
 
 ### Cómo actualizar el contenido
 
-1. Editar `carpatos_pwa.html` (o `manifest.json`) en Claude Code
+1. Editar el HTML (o `manifest.json`) en Claude Code
 2. `git add`, `git commit`, `git push`
-3. GitHub Pages despliega solo en unos 2 minutos
+3. GitHub Pages despliega en ~2 minutos
 
-No hay que compilar nada. Si el móvil sigue mostrando la versión antigua, es la caché del Service Worker: cerrar la app y volver a abrirla, o subir el número de versión de la caché en el código.
+No hay que compilar nada. Si el móvil sigue mostrando la versión antigua es la caché del Service Worker: cerrar y volver a abrir la app, o incrementar el número de versión de la caché en el código del SW.
 
 ### Cómo instalarla en el móvil
 
-1. Abrir la URL de producción en Chrome
-2. Menú de tres puntos → **Añadir a pantalla de inicio**
-3. Se instala como app: icono propio, sin barra de navegador y con acceso offline
+1. Abrir la URL de producción en Chrome (Android) o Safari (iOS)
+2. Menú → **Añadir a pantalla de inicio**
+3. Se instala como app: icono propio, sin barra de navegador, con acceso offline
 
 ### Lecciones aprendidas
 
-- **El manifest tiene que ser un fichero real servido por HTTP.** Ni los `data:` URI ni los blob URL funcionan en Chrome Android para el modo standalone. Se probaron las tres vías y solo la tercera instala la app correctamente.
-- **Cuidado con el orden del JavaScript.** El Service Worker va embebido en el propio HTML como blob URL, y durante la sesión no llegaba a registrarse nunca: el bloque de manifest inline que lo precedía hacía `document.getElementById('manifest-link').href = ...` sobre un elemento que no existía en el DOM. `getElementById` devolvía `null`, el TypeError cortaba el script en seco y el registro del Service Worker, que venía justo después, no se ejecutaba. Al pasar al `manifest.json` real ese bloque desapareció y con él el problema. Moraleja: un error de JavaScript no rompe solo su línea, mata todo lo que viene detrás.
-- **Con `file://` no funciona nada.** Ni manifest ni Service Worker ni instalación. La PWA hay que servirla por HTTP sí o sí, aunque sea para probarla.
-- **El repositorio solo lleva fuentes.** `node_modules/`, `*.docx`, `*.pdf` y `pagina-*.jpg` están en `.gitignore`: las dependencias se reinstalan con `npm install` y el Word y sus imágenes de verificación se regeneran con el script.
+- **El manifest tiene que ser un fichero real servido por HTTP.** Ni los `data:` URI ni los blob URL funcionan en Chrome Android para el modo standalone. Solo un `manifest.json` real, con su propio Content-Type, instala la app correctamente.
+- **Cuidado con el orden del JavaScript.** El Service Worker va embebido en el HTML como blob URL. Si cualquier línea de JS lanza un error antes de llegar al `navigator.serviceWorker.register(...)`, el SW nunca se registra y la app no funciona offline. Un TypeError no rompe solo su línea: mata todo lo que viene detrás.
+- **Con `file://` no funciona nada.** Ni manifest, ni Service Worker, ni instalación. La PWA necesita servirse por HTTP aunque sea para probarla.
+- **El repositorio solo lleva fuentes.** `node_modules/`, los `.docx` generados, los PDF y las imágenes de verificación van en `.gitignore`. Las dependencias se reinstalan con `npm install`; el Word y sus verificaciones se regeneran con el script.
 
 ### Repositorio
 
+Patrón recomendado:
+
 ```
-git@github.com:plloretmitra/carpatos.git    rama master
+git@github.com:<usuario>/<destino>.git    rama master
 ```
 
-Ocho ficheros: la PWA y su manifest, el generador del Word, la imagen de portada, esta metodología, los dos `package*.json` y el `.gitignore`.
+Ficheros típicos: el HTML de la PWA, `manifest.json`, el generador del Word, la imagen de portada, el fichero de metodología, `package.json`, `package-lock.json` y `.gitignore`.
