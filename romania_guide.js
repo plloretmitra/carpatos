@@ -1244,7 +1244,12 @@ Packer.toBuffer(doc).then(buffer => {
   console.log('Documento generado: ./rumania_guia_viaje.docx');
 
   // Exportación automática a PDF con LibreOffice, para poder revisar el
-  // maquetado sin pasos manuales.
-  execSync('soffice --headless --convert-to pdf ./rumania_guia_viaje.docx', { stdio: 'ignore' });
-  console.log('PDF generado: ./rumania_guia_viaje.pdf');
+  // maquetado sin pasos manuales. Es opcional: si falla, el .docx ya está
+  // escrito y sigue siendo válido.
+  try {
+    execSync('soffice --headless --convert-to pdf ./rumania_guia_viaje.docx', { stdio: 'ignore' });
+    console.log('PDF generado: ./rumania_guia_viaje.pdf');
+  } catch (e) {
+    console.warn('Aviso: no se pudo generar el PDF (¿LibreOffice instalado?):', e.message);
+  }
 });
