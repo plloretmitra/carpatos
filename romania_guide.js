@@ -850,7 +850,7 @@ const sections = [
       empty(160),
 
       infoBox("Quesos rumanos que hay que probar", [
-        "Brânzä de burduf — Queso de oveja intenso, curado en corteza de abeto. Sabor largo y complejo",
+        "Brânză de burduf — Queso de oveja intenso, curado en corteza de abeto. Sabor largo y complejo",
         "Telemea — Queso blanco salado similar al feta. Ideal con tomate y cebolleta en los desayunos",
         "Cașcaval — Queso amarillo semi-curado, normal o ahumado. Base de muchos platos gratinados",
         "Urdă — Textura suave como ricotta, ligeramente dulce. Ideal en los papanași y pastas rellenas",
