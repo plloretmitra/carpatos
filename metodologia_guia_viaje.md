@@ -52,10 +52,14 @@ Secciones que enriquecen la guía más allá del día a día:
 
 ## 5. Generación del documento
 
-- Implementación en Node.js usando la librería `docx` (preinstalada, no requiere npm install)
+- Implementación en Node.js usando la librería `docx`. Hay que instalarla con `npm install docx` en la carpeta del proyecto antes de la primera ejecución: no viene preinstalada
+- `node_modules/` va en `.gitignore` y no se sube al repositorio. Al clonar el proyecto en una máquina nueva, reinstalar las dependencias con `npm install` antes de generar nada
 - Un único fichero `.js` que genera el `.docx` completo
 - Funciones auxiliares reutilizables: cabecera de día, caja informativa, momento del día
-- Verificación visual: conversión a PDF con LibreOffice y revisión de páginas con pdftoppm
+- Verificación visual en dos pasos:
+  1. Convertir el `.docx` a PDF con LibreOffice: `soffice --headless --convert-to pdf <fichero>.docx`
+  2. Rasterizar el PDF a una imagen por página con Ghostscript: `gs -dNOPAUSE -dBATCH -sDEVICE=jpeg -r100 -sOutputFile=pagina-%02d.jpg <fichero>.pdf`
+- Revisar las imágenes resultantes para detectar páginas en blanco, cajas partidas entre páginas y cabeceras huérfanas al pie
 
 ---
 
