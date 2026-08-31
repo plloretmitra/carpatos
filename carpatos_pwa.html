@@ -1434,7 +1434,7 @@
     const swCode = `
       const CACHE = 'carpatos-v1';
       self.addEventListener('install', e => {
-        e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/'])));
+        e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/', 'portada.jpg'])));
         self.skipWaiting();
       });
       self.addEventListener('fetch', e => {
