@@ -95,10 +95,11 @@ Una vez cerrada la guía Word, se puede convertir en una Progressive Web App (PW
 
 ### Qué es y qué contiene
 
-Dos ficheros:
+Tres ficheros:
 
 - **`<nombre>.html`** — la aplicación entera: estructura, estilos, contenido y lógica en un solo fichero. Sin dependencias externas ni build step.
 - **`manifest.json`** — nombre, icono, colores y modo de visualización. Es lo que permite instalarla como app standalone.
+- **`sw.js`** — Service Worker independiente que gestiona la caché offline. Debe servirse desde el mismo origen que el HTML.
 
 El contenido sale del mismo material que el Word: los días con sus lugares y descripciones, más las secciones complementarias (gastronomía, logística, etc.).
 
@@ -155,4 +156,4 @@ Patrón recomendado:
 git@github.com:<usuario>/<destino>.git    rama master
 ```
 
-Ficheros típicos: el HTML de la PWA, `manifest.json`, el generador del Word, la imagen de portada, el fichero de metodología, `package.json`, `package-lock.json` y `.gitignore`.
+Ficheros típicos: el HTML de la PWA, `manifest.json`, `sw.js`, el generador del Word, la imagen de portada, el fichero de metodología, `package.json`, `package-lock.json` y `.gitignore`.
