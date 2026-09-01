@@ -138,7 +138,12 @@ No hay que compilar nada. Si el móvil sigue mostrando la versión antigua es la
 ### Lecciones aprendidas
 
 - **El manifest tiene que ser un fichero real servido por HTTP.** Ni los `data:` URI ni los blob URL funcionan en Chrome Android para el modo standalone. Solo un `manifest.json` real, con su propio Content-Type, instala la app correctamente.
-- **Cuidado con el orden del JavaScript.** El Service Worker va embebido en el HTML como blob URL. Si cualquier línea de JS lanza un error antes de llegar al `navigator.serviceWorker.register(...)`, el SW nunca se registra y la app no funciona offline. Un TypeError no rompe solo su línea: mata todo lo que viene detrás.
+- **El Service Worker tiene que ser un fichero `sw.js` separado, servido desde el mismo origen.** Registrarlo desde un `blob:` URL (la aproximación inline, generando el código del SW como template literal dentro del HTML y pasándolo por `URL.createObjectURL`) es rechazado por los navegadores: el SW nunca llega a instalarse y la app no funciona offline. El registro correcto es:
+  ```js
+  navigator.serviceWorker.register('./sw.js')
+  ```
+- **El array de caché debe incluir explícitamente todos los recursos que la app necesita offline**: el HTML, el `manifest.json` y cualquier imagen referenciada externamente (como `portada.jpg`). No incluir `'/'` si no hay `index.html` en la raíz: `addAll` es atómico y un solo 404 cancela toda la caché.
+- **Cuidado con el orden del JavaScript.** Si cualquier línea de JS lanza un error antes de llegar al `navigator.serviceWorker.register(...)`, el SW nunca se registra y la app no funciona offline. Un TypeError no rompe solo su línea: mata todo lo que viene detrás.
 - **Con `file://` no funciona nada.** Ni manifest, ni Service Worker, ni instalación. La PWA necesita servirse por HTTP aunque sea para probarla.
 - **El repositorio solo lleva fuentes.** `node_modules/`, los `.docx` generados, los PDF y las imágenes de verificación van en `.gitignore`. Las dependencias se reinstalan con `npm install`; el Word y sus verificaciones se regeneran con el script.
 
